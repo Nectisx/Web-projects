@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FastFood - Commandez en ligne</title>
+  <meta name="description" content="FastFood - Burgers, tacos, desserts et boissons livrés rapidement. Commandez en ligne et profitez d'offres exclusives !" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            poppins: ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            primary: '#FF6B35',    // Orange vibrant
+            secondary: '#FFC857',  // Jaune moutarde
+            dark: '#1A1A2E',       // Noir profond
+            accent: '#E63946',     // Rouge appétissant
+          },
+          boxShadow: {
+            glass: '0 10px 40px rgba(0,0,0,0.25)',
+          },
+          backdropBlur: {
+            glass: '16px',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts - Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- AOS - Animations au scroll -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Swiper -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+  <style>
+    :root {
+      --color-primary: #FF6B35;
+      --color-secondary: #FFC857;
+      --color-dark: #1A1A2E;
+      --color-accent: #E63946;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Glassmorphism */
+    .glass {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Typing effect */
+    .typing {
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 3px solid rgba(255,255,255,0.75);
+      animation: typing 3s steps(30, end), blink-caret 0.8s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: rgba(255,255,255,0.75); }
+    }
+
+    /* Fly to cart animation */
+    @keyframes fly-to-cart {
+      0% {
+        transform: scale(1) translate(0, 0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.1) translate(150px, -200px);
+        opacity: 0;
+      }
+    }
+
+    .fly-image {
+      pointer-events: none;
+      position: fixed;
+      z-index: 9999;
+      animation: fly-to-cart 0.8s ease-in-out forwards;
+    }
+
+    /* Skeleton loader */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(148,163,184,0.2) 25%, rgba(148,163,184,0.4) 50%, rgba(148,163,184,0.2) 75%);
+      background-size: 400% 100%;
+      animation: shimmer 1.4s ease infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+
+    /* Scrollbar minimal */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #020617;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 dark:bg-slate-950 dark:text-slate-100">
+
+  <!-- Scroll to top -->
+  <button id="scrollTopBtn" class="hidden fixed bottom-6 right-6 z-40 p-3 rounded-full bg-gradient-to-r from-primary to-accent shadow-lg shadow-primary/40 hover:scale-110 transition transform duration-300"
+          aria-label="Revenir en haut">
+    <i class="fa-solid fa-arrow-up text-white"></i>
+  </button>
+
+  <!-- Cart Side Panel -->
+  <div id="cartOverlay" class="fixed inset-0 bg-black/60 z-40 hidden"></div>
+  <aside id="cartPanel" class="fixed top-0 right-0 h-full w-full sm:w-96 bg-slate-900 text-slate-100 z-50 transform translate-x-full transition-transform duration-300 shadow-glass flex flex-col">
+    <div class="flex items-center justify-between p-4 border-b border-slate-700">
+      <h2 class="text-xl font-semibold flex items-center gap-2">
+        <i class="fa-solid fa-bag-shopping text-primary"></i>
+        Votre panier
+      </h2>
+      <button id="closeCartBtn" class="text-slate-400 hover:text-white transition" aria-label="Fermer le panier">
+        <i class="fa-solid fa-xmark text-2xl"></i>
+      </button>
+    </div>
+    <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-4">
+      <!-- Items -->
+    </div>
+    <div class="border-t border-slate-700 p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="font-medium text-slate-300">Total</span>
+        <span id="cartTotal" class="text-2xl font-bold text-primary">0,00 €</span>
+      </div>
+      <div class="flex items-center justify-between text-xs text-slate-400">
+        <span>Livraison gratuite dès 25€</span>
+        <span id="cartItemsCountText"></span>
+      </div>
+      <div class="flex gap-3">
+        <button id="clearCartBtn" class="flex-1 py-2 rounded-xl border border-slate-600 hover:bg-slate-800 text-sm transition">
+          Vider le panier
+        </button>
+        <button id="checkoutBtn" class="flex-1 py-2 rounded-xl bg-gradient-to-r from-primary to-accent text-sm font-semibold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/40 transition">
+          <span>Valider commande</span>
+          <i class="fa-solid fa-bolt"></i>
+        </button>
+      </div>
+      <p id="cartTrustText" class="text-[11px] text-slate-400 flex items-center gap-2">
+        <i class="fa-solid fa-shield-halved text-green-400"></i>
+        Paiement 100% sécurisé. SSL &amp; cryptage avancé.
+      </p>
+    </div>
+  </aside>
+
+  <!-- Product Modal -->
+  <div id="productModalOverlay" class="fixed inset-0 bg-black/70 z-40 hidden"></div>
+  <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0 transition">
+    <div class="max-w-3xl w-[95%] glass rounded-3xl shadow-glass overflow-hidden pointer-events-auto relative">
+      <button id="closeProductModalBtn" class="absolute top-4 right-4 text-slate-300 hover:text-white transition text-2xl" aria-label="Fermer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="grid grid-cols-1 md:grid-cols-2">
+        <div class="relative h-72 md:h-full">
+          <img id="modalProductImage" src="" alt="" class="w-full h-full object-cover" loading="lazy" />
+          <span id="modalProductBadge" class="absolute top-4 left-4 bg-primary text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+            BEST-SELLER
+          </span>
+        </div>
+        <div class="p-6 md:p-8 space-y-4">
+          <h3 id="modalProductName" class="text-2xl font-bold"></h3>
+          <p id="modalProductDescription" class="text-sm text-slate-300"></p>
+          <div class="flex items-center gap-2 text-yellow-400 text-sm">
+            <span id="modalProductRating" class="flex items-center gap-1"></span>
+            <span id="modalProductReviews" class="text-xs text-slate-300"></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-400">À partir de</p>
+              <p id="modalProductPrice" class="text-3xl font-extrabold text-primary"></p>
+            </div>
+            <div class="text-right text-xs text-slate-400">
+              <p><i class="fa-solid fa-fire-flame-curved text-accent"></i> Plus que <span id="modalStockLeft">3</span> en stock</p>
+              <p><span id="modalViewersCount">142</span> personnes regardent ce produit</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button id="modalAddToCartBtn" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-primary to-accent font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/40 transition">
+              <span>Ajouter au panier</span>
+              <i class="fa-solid fa-cart-plus"></i>
+            </button>
+            <button class="px-4 text-sm border border-slate-600 rounded-2xl hover:bg-slate-800 transition">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+          </div>
+          <ul class="text-xs text-slate-400 space-y-1">
+            <li><i class="fa-solid fa-motorcycle text-primary"></i> Livraison express &lt; 30 min dans votre zone</li>
+            <li><i class="fa-solid fa-shield text-green-400"></i> 100% satisfait ou remboursé</li>
+            <li><i class="fa-solid fa-burger text-secondary"></i> Produits ultra frais préparés à la commande</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <header id="navbar" class="fixed top-0 left-0 right-0 z-30 transition-all duration-300 bg-transparent">
+    <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 sm:py-4">
+      <!-- Logo -->
+      <a href="#hero" class="flex items-center gap-2 group">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/40 group-hover:scale-110 transition">
+          <i class="fa-solid fa-burger text-white text-xl"></i>
+        </div>
+        <div class="leading-tight">
+          <p class="font-extrabold text-lg tracking-tight">Fast<span class="text-primary">Food</span></p>
+          <p class="text-[11px] text-slate-300">10K+ gourmands conquis</p>
+        </div>
+      </a>
+
+      <!-- Center menu -->
+      <div class="hidden md:flex items-center gap-6 text-sm">
+        <a href="#hero" class="nav-link text-slate-200 hover:text-primary transition">Accueil</a>
+        <a href="#menu" class="nav-link text-slate-200 hover:text-primary transition">Menu</a>
+        <a href="#offers" class="nav-link text-slate-200 hover:text-primary transition">Offres</a>
+        <a href="#contact" class="nav-link text-slate-200 hover:text-primary transition">Contact</a>
+      </div>
+
+      <!-- Right actions -->
+      <div class="flex items-center gap-3">
+        <!-- Dark mode -->
+        <button id="darkModeToggle" class="hidden sm:flex items-center justify-center w-9 h-9 rounded-full border border-slate-500/60 bg-slate-900/60 backdrop-blur-md hover:scale-105 transition" aria-label="Changer de thème">
+          <i class="fa-solid fa-moon text-yellow-300 hidden dark:inline"></i>
+          <i class="fa-solid fa-sun text-yellow-300 dark:hidden"></i>
+        </button>
+
+        <!-- Cart -->
+        <button id="cartBtn" class="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-slate-900/70 backdrop-blur-md border border-slate-700 hover:border-primary hover:scale-105 transition shadow-glass" aria-label="Panier">
+          <i class="fa-solid fa-basket-shopping text-lg text-primary"></i>
+          <span id="cartCountBadge" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent text-[11px] flex items-center justify-center font-semibold shadow-lg">
+            0
+          </span>
+        </button>
+
+        <!-- CTA -->
+        <a href="#menu" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-gradient-to-r from-primary to-accent text-xs sm:text-sm font-semibold shadow-lg shadow-primary/40 hover:scale-105 transition">
+          <i class="fa-solid fa-bolt"></i>
+          <span>Commander maintenant</span>
+        </a>
+
+        <!-- Burger mobile -->
+        <button id="mobileMenuBtn" class="md:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-slate-900/70 border border-slate-700 text-slate-100" aria-label="Menu">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden max-h-0 overflow-hidden transition-all duration-300 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800">
+      <div class="max-w-6xl mx-auto px-4 py-4 space-y-3 text-sm">
+        <a href="#hero" class="block py-2 text-slate-200 hover:text-primary">Accueil</a>
+        <a href="#menu" class="block py-2 text-slate-200 hover:text-primary">Menu</a>
+        <a href="#offers" class="block py-2 text-slate-200 hover:text-primary">Offres</a>
+        <a href="#contact" class="block py-2 text-slate-200 hover:text-primary">Contact</a>
+        <button id="darkModeToggleMobile" class="mt-2 flex items-center gap-2 text-slate-200">
+          <i class="fa-solid fa-moon text-yellow-300 hidden dark:inline"></i>
+          <i class="fa-solid fa-sun text-yellow-300 dark:hidden"></i>
+          <span>Basculer thème</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="pt-24 lg:pt-28">
+
+    <!-- HERO -->
+    <section id="hero" class="relative min-h-[90vh] flex items-center">
+      <!-- Background -->
+      <div class="absolute inset-0">
+        <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1600&q=80"
+             alt="Burger appétissant" class="w-full h-full object-cover" loading="lazy">
+        <div class="absolute inset-0 bg-gradient-to-br from-black/90 via-black/80 to-slate-950/90"></div>
+      </div>
+
+      <!-- Content -->
+      <div class="relative max-w-6xl mx-auto px-4 py-16 flex flex-col lg:flex-row items-center gap-12">
+        <div class="w-full lg:w-1/2 space-y-6" data-aos="fade-right">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/80 border border-primary/40 text-[11px] uppercase tracking-wide text-secondary">
+            <i class="fa-solid fa-bolt"></i> Livraison en 30 min garantie
+          </span>
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight">
+            <span class="typing block mb-2">Le fast-food qui connaît votre faim.</span>
+          </h1>
+          <p class="text-sm sm:text-base text-slate-200 max-w-xl">
+            Burgers gourmets, tacos généreux, desserts fondants et boissons bien fraîches.
+            Commandez en quelques clics, on s'occupe du reste. <span class="font-semibold text-secondary">Livraison express</span> dans votre quartier.
+          </p>
+
+          <!-- Stats -->
+          <div class="grid grid-cols-3 gap-4 text-center text-xs sm:text-sm">
+            <div class="glass rounded-2xl px-3 py-4">
+              <p class="text-secondary font-bold text-lg sm:text-2xl counter" data-target="5000">0</p>
+              <p class="text-slate-300 text-[11px] sm:text-xs">Clients satisfaits</p>
+            </div>
+            <div class="glass rounded-2xl px-3 py-4">
+              <p class="text-secondary font-bold text-lg sm:text-2xl">30<span class="text-sm">min</span></p>
+              <p class="text-slate-300 text-[11px] sm:text-xs">Livraison moyenne</p>
+            </div>
+            <div class="glass rounded-2xl px-3 py-4">
+              <p class="text-secondary font-bold text-lg sm:text-2xl">4.9<span class="text-sm">/5</span></p>
+              <p class="text-slate-300 text-[11px] sm:text-xs">Note moyenne</p>
+            </div>
+          </div>
+
+          <!-- CTAs -->
+          <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:gap-4">
+            <a href="#menu" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-primary to-accent font-semibold text-sm shadow-lg shadow-primary/40 hover:scale-[1.02] transition">
+              <i class="fa-solid fa-burger"></i>
+              <span>J'ai faim !</span>
+            </a>
+            <a href="#menu" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl border border-slate-600/80 bg-slate-900/50 text-xs sm:text-sm hover:bg-slate-800/70 transition">
+              <i class="fa-solid fa-eye"></i>
+              <span>Voir le menu</span>
+            </a>
+          </div>
+
+          <!-- Trust -->
+          <div class="flex items-center gap-3 text-[11px] sm:text-xs text-slate-300">
+            <div class="flex items-center gap-1">
+              <i class="fa-solid fa-lock text-green-400"></i>
+              <span>Paiement 100% sécurisé</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <i class="fa-solid fa-medal text-yellow-400"></i>
+              <span>100% satisfait ou remboursé</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero card -->
+        <div class="w-full lg:w-1/2" data-aos="fade-left">
+          <div class="glass rounded-3xl p-5 sm:p-6 lg:p-8 shadow-glass relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-gradient-to-br from-primary/40 to-accent/40 blur-3xl opacity-40 pointer-events-none"></div>
+            <div class="relative space-y-4">
+              <h2 class="text-lg sm:text-xl font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-fire-flame-curved text-accent"></i>
+                Burger du moment
+              </h2>
+              <div class="flex gap-4 items-center">
+                <div class="w-28 h-28 rounded-3xl overflow-hidden flex-shrink-0">
+                  <img src="https://images.unsplash.com/photo-1606756790138-261c0c4a5121?auto=format&fit=crop&w=400&q=80"
+                       alt="Burger Signature" class="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div class="space-y-2 text-xs sm:text-sm">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 rounded-full bg-primary/20 text-primary text-[10px] font-semibold uppercase">Nouveau</span>
+                    <span class="px-2 py-1 rounded-full bg-accent/20 text-accent text-[10px] font-semibold uppercase">-20%</span>
+                  </div>
+                  <p class="font-semibold text-sm sm:text-base">Smoky Double Cheese Burger</p>
+                  <p class="text-slate-300">Double steak, cheddar affiné, oignons caramélisés, sauce secrète maison.</p>
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-[11px] text-slate-400 line-through">14,90 €</p>
+                      <p class="text-xl sm:text-2xl font-bold text-secondary">11,90 €</p>
+                    </div>
+                    <button class="px-4 py-2 rounded-2xl bg-gradient-to-r from-primary to-accent text-xs font-semibold flex items-center gap-2 hover:scale-105 transition add-to-cart-hero"
+                            data-product-id="hero-burger">
+                      <i class="fa-solid fa-cart-plus"></i>
+                      <span>Ajouter</span>
+                    </button>
+                  </div>
+                  <div class="flex items-center gap-2 text-[11px] text-slate-300">
+                    <span class="flex items-center text-yellow-400">
+                      <i class="fa-solid fa-star"></i>
+                      <i class="fa-solid fa-star"></i>
+                      <i class="fa-solid fa-star"></i>
+                      <i class="fa-solid fa-star"></i>
+                      <i class="fa-solid fa-star-half-stroke"></i>
+                    </span>
+                    <span>4.9/5 • 328 avis</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3 flex items-center justify-between text-[11px] text-slate-300">
+                <span>
+                  <i class="fa-solid fa-users-line text-green-400"></i>
+                  <span id="ordersTodayCounter">0</span> commandes aujourd'hui
+                </span>
+                <span>
+                  <i class="fa-solid fa-eye text-primary"></i>
+                  <span id="liveViewersCounter">142</span> personnes regardent ce produit
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center text-xs text-slate-200">
+        <span>Scroll</span>
+        <div class="w-[1px] h-12 bg-gradient-to-b from-slate-100/70 to-transparent relative overflow-hidden mt-1">
+          <div class="absolute inset-0 bg-gradient-to-b from-secondary via-transparent to-transparent animate-pulse"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section id="categories" class="py-16 bg-slate-950">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Catégories</p>
+            <h2 class="text-2xl sm:text-3xl font-bold">Ce qui fait craquer nos clients</h2>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- Burger -->
+          <div class="group glass rounded-3xl p-5 flex flex-col gap-3 transform transition hover:-translate-y-2 hover:shadow-glass" data-aos="fade-up">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold">Burgers</span>
+              <span class="w-10 h-10 rounded-2xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition">
+                <i class="fa-solid fa-burger text-primary"></i>
+              </span>
+            </div>
+            <p class="text-xs text-slate-300 flex-1">
+              Des burgers généreux, pains briochés toastés, viande de qualité, sauces maison.
+            </p>
+            <button class="mt-2 text-xs flex items-center gap-2 text-secondary group-hover:gap-3 transition">
+              Découvrir <i class="fa-solid fa-arrow-right-long"></i>
+            </button>
+          </div>
+
+          <!-- Tacos -->
+          <div class="group glass rounded-3xl p-5 flex flex-col gap-3 transform transition hover:-translate-y-2 hover:shadow-glass" data-aos="fade-up" data-aos-delay="100">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold">Tacos</span>
+              <span class="w-10 h-10 rounded-2xl bg-secondary/20 flex items-center justify-center group-hover:scale-110 transition">
+                <i class="fa-solid fa-pepper-hot text-secondary"></i>
+              </span>
+            </div>
+            <p class="text-xs text-slate-300 flex-1">
+              Des tacos bien garnis, croustillants à l'extérieur, fondants à l'intérieur.
+            </p>
+            <button class="mt-2 text-xs flex items-center gap-2 text-secondary group-hover:gap-3 transition">
+              Craquer <i class="fa-solid fa-arrow-right-long"></i>
+            </button>
+          </div>
+
+          <!-- Boissons -->
+          <div class="group glass rounded-3xl p-5 flex flex-col gap-3 transform transition hover:-translate-y-2 hover:shadow-glass" data-aos="fade-up" data-aos-delay="200">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold">Boissons</span>
+              <span class="w-10 h-10 rounded-2xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition">
+                <i class="fa-solid fa-martini-glass-citrus text-blue-400"></i>
+              </span>
+            </div>
+            <p class="text-xs text-slate-300 flex-1">
+              Sodas, milkshakes, boissons maison fraîches et ultra-rafraîchissantes.
+            </p>
+            <button class="mt-2 text-xs flex items-center gap-2 text-secondary group-hover:gap-3 transition">
+              Se rafraîchir <i class="fa-solid fa-arrow-right-long"></i>
+            </button>
+          </div>
+
+          <!-- Desserts -->
+          <div class="group glass rounded-3xl p-5 flex flex-col gap-3 transform transition hover:-translate-y-2 hover:shadow-glass" data-aos="fade-up" data-aos-delay="300">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold">Desserts</span>
+              <span class="w-10 h-10 rounded-2xl bg-pink-500/20 flex items-center justify-center group-hover:scale-110 transition">
+                <i class="fa-solid fa-ice-cream text-pink-400"></i>
+              </span>
+            </div>
+            <p class="text-xs text-slate-300 flex-1">
+              Cookies, brownies, tiramisus &amp; glaces pour finir en beauté.
+            </p>
+            <button class="mt-2 text-xs flex items-center gap-2 text-secondary group-hover:gap-3 transition">
+              Se faire plaisir <i class="fa-solid fa-arrow-right-long"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MENU INTERACTIF -->
+    <section id="menu" class="py-16 bg-slate-950/90 border-t border-slate-800">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+          <div>
+            <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Menu</p>
+            <h2 class="text-2xl sm:text-3xl font-bold">Choisissez votre combo parfait</h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              Filtrez par catégorie, recherchez un produit, ajoutez au panier en un clic.
+            </p>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+            <!-- Search -->
+            <div class="relative w-full sm:w-64">
+              <input id="searchInput" type="text" placeholder="Rechercher un produit..."
+                     class="w-full bg-slate-900/70 border border-slate-700 rounded-2xl px-4 py-2.5 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+              <i class="fa-solid fa-magnifying-glass text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 text-xs"></i>
+              <div id="searchSuggestions" class="absolute left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-2xl text-xs z-20 hidden max-h-48 overflow-y-auto"></div>
+            </div>
+            <!-- Dark mode mini -->
+            <button id="darkModeToggleMenu" class="sm:hidden inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-900/70">
+              <i class="fa-solid fa-moon text-yellow-300 hidden dark:inline"></i>
+              <i class="fa-solid fa-sun text-yellow-300 dark:hidden"></i>
+              Thème
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button class="menu-filter-btn px-3 py-1.5 rounded-full border border-slate-700/80 text-xs bg-slate-900/80 text-slate-200 data-[active=true]:bg-primary data-[active=true]:border-primary data-[active=true]:text-white transition" data-category="all" data-active="true">
+            Tout
+          </button>
+          <button class="menu-filter-btn px-3 py-1.5 rounded-full border border-slate-700/80 text-xs bg-slate-900/80 text-slate-200" data-category="burger">
+            Burgers
+          </button>
+          <button class="menu-filter-btn px-3 py-1.5 rounded-full border border-slate-700/80 text-xs bg-slate-900/80 text-slate-200" data-category="tacos">
+            Tacos
+          </button>
+          <button class="menu-filter-btn px-3 py-1.5 rounded-full border border-slate-700/80 text-xs bg-slate-900/80 text-slate-200" data-category="boisson">
+            Boissons
+          </button>
+          <button class="menu-filter-btn px-3 py-1.5 rounded-full border border-slate-700/80 text-xs bg-slate-900/80 text-slate-200" data-category="dessert">
+            Desserts
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between mb-4 text-[11px] text-slate-400">
+          <span id="productsCountText">0 produits trouvés</span>
+          <span><i class="fa-solid fa-truck text-primary"></i> Livraison gratuite dès 25€</span>
+        </div>
+
+        <!-- Products grid -->
+        <div id="productsSkeleton" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Skeleton cards -->
+          <div class="rounded-3xl overflow-hidden bg-slate-900/80 border border-slate-800 skeleton h-72"></div>
+          <div class="rounded-3xl overflow-hidden bg-slate-900/80 border border-slate-800 skeleton h-72 hidden sm:block"></div>
+          <div class="rounded-3xl overflow-hidden bg-slate-900/80 border border-slate-800 skeleton h-72 hidden lg:block"></div>
+        </div>
+
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 hidden"></div>
+      </div>
+    </section>
+
+    <!-- BEST SELLERS -->
+    <section id="best-sellers" class="py-16 bg-slate-950">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Best-sellers</p>
+            <h2 class="text-2xl sm:text-3xl font-bold">Les indétrônables de la carte</h2>
+          </div>
+        </div>
+
+        <div class="swiper bestSellersSwiper" data-aos="fade-up">
+          <div class="swiper-wrapper" id="bestSellersWrapper">
+            <!-- Slides from JS -->
+          </div>
+          <div class="flex items-center justify-between mt-4">
+            <div class="swiper-pagination !static !w-auto"></div>
+            <div class="flex gap-2">
+              <button class="best-sellers-prev w-8 h-8 rounded-full border border-slate-600 flex items-center justify-center text-xs hover:bg-slate-800">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button class="best-sellers-next w-8 h-8 rounded-full border border-slate-600 flex items-center justify-center text-xs hover:bg-slate-800">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OFFRES SPÉCIALES -->
+    <section id="offers" class="py-16 bg-gradient-to-br from-primary/10 via-slate-950 to-accent/20 relative overflow-hidden">
+      <div class="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-primary/30 blur-3xl opacity-50"></div>
+      <div class="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-accent/30 blur-3xl opacity-50"></div>
+
+      <div class="max-w-6xl mx-auto px-4 relative">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div data-aos="fade-right">
+            <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Offre limitée</p>
+            <h2 class="text-2xl sm:text-3xl font-bold mb-3">Mega Burger Box -30%</h2>
+            <p class="text-xs sm:text-sm text-slate-200 mb-4 max-w-md">
+              2 Burgers au choix, 2 tacos, 2 desserts, 2 boissons. Parfait pour une soirée entre amis ou en couple affamé.
+              Offre valable pour une durée ultra limitée.
+            </p>
+
+            <!-- Countdown -->
+            <div class="inline-flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-950/80 border border-accent/60 mb-4">
+              <span class="text-xs uppercase tracking-widest text-accent font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-hourglass-half"></i> Expire dans
+              </span>
+              <div id="countdown" class="flex gap-2 text-xs sm:text-sm font-semibold">
+                <div class="px-2 py-1 rounded-xl bg-slate-900 text-center">
+                  <div id="cd-days" class="text-secondary text-sm sm:text-base">00</div>
+                  <div class="text-[10px] text-slate-400">jours</div>
+                </div>
+                <div class="px-2 py-1 rounded-xl bg-slate-900 text-center">
+                  <div id="cd-hours" class="text-secondary text-sm sm:text-base">00</div>
+                  <div class="text-[10px] text-slate-400">h</div>
+                </div>
+                <div class="px-2 py-1 rounded-xl bg-slate-900 text-center">
+                  <div id="cd-minutes" class="text-secondary text-sm sm:text-base">00</div>
+                  <div class="text-[10px] text-slate-400">min</div>
+                </div>
+                <div class="px-2 py-1 rounded-xl bg-slate-900 text-center">
+                  <div id="cd-seconds" class="text-secondary text-sm sm:text-base">00</div>
+                  <div class="text-[10px] text-slate-400">sec</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4 mb-5 text-sm">
+              <div>
+                <p class="text-[11px] text-slate-400 line-through">39,90 €</p>
+                <p class="text-2xl sm:text-3xl font-extrabold text-secondary">27,90 €</p>
+              </div>
+              <p class="text-[11px] sm:text-xs text-slate-300 max-w-[180px]">
+                <i class="fa-solid fa-circle-exclamation text-accent"></i> Plus que 7 box disponibles à ce prix.
+              </p>
+            </div>
+
+            <button class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-primary to-accent text-sm font-semibold shadow-lg shadow-primary/40 hover:scale-[1.02] transition add-offer-to-cart">
+              <i class="fa-solid fa-bolt"></i>
+              <span>Profiter de l'offre</span>
+            </button>
+          </div>
+
+          <div class="relative" data-aos="fade-left">
+            <div class="glass rounded-3xl overflow-hidden shadow-glass">
+              <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80"
+                   alt="Offre spéciale burger box" class="w-full h-64 sm:h-80 object-cover" loading="lazy" />
+            </div>
+            <div class="absolute -bottom-4 -left-2 glass px-4 py-3 rounded-2xl text-xs flex items-center gap-2">
+              <i class="fa-solid fa-circle-check text-green-400"></i>
+              <span>Livraison gratuite incluse</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Témoignages -->
+    <section id="testimonials" class="py-16 bg-slate-950">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Avis clients</p>
+            <h2 class="text-2xl sm:text-3xl font-bold">Ils parlent mieux de nous que nous</h2>
+          </div>
+        </div>
+
+        <div class="swiper testimonialsSwiper" data-aos="fade-up">
+          <div class="swiper-wrapper">
+            <!-- Cards -->
+            <div class="swiper-slide">
+              <div class="glass rounded-3xl p-5 h-full flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent p-[2px]">
+                    <img src="https://images.unsplash.com/photo-1494797710133-75adf6c1f4a3?auto=format&fit=crop&w=200&q=80"
+                         alt="Client" class="w-full h-full rounded-full object-cover" loading="lazy" />
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold">Sarah L.</p>
+                    <p class="text-[11px] text-slate-400">Commande hier</p>
+                  </div>
+                  <div class="ml-auto flex items-center text-yellow-400 text-xs">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-200 flex-1">
+                  "Les meilleurs burgers du quartier. Livraison super rapide, tout était encore bien chaud. Mention spéciale au Smoky Double Cheese."
+                </p>
+                <p class="text-[11px] text-slate-400">
+                  <i class="fa-solid fa-calendar-day"></i> 13 novembre 2025
+                </p>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="glass rounded-3xl p-5 h-full flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent p-[2px]">
+                    <img src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=200&q=80"
+                         alt="Client" class="w-full h-full rounded-full object-cover" loading="lazy" />
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold">Mehdi R.</p>
+                    <p class="text-[11px] text-slate-400">Fidèle depuis 2024</p>
+                  </div>
+                  <div class="ml-auto flex items-center text-yellow-400 text-xs">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star-half-stroke"></i>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-200 flex-1">
+                  "Je commande minimum 2 fois par semaine, jamais déçu. Les tacos sont incroyables et bien garnis."
+                </p>
+                <p class="text-[11px] text-slate-400">
+                  <i class="fa-solid fa-calendar-day"></i> 7 novembre 2025
+                </p>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="glass rounded-3xl p-5 h-full flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent p-[2px]">
+                    <img src="https://images.unsplash.com/photo-1525134479668-1bee5c7c6845?auto=format&fit=crop&w=200&q=80"
+                         alt="Client" class="w-full h-full rounded-full object-cover" loading="lazy" />
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold">Thomas G.</p>
+                    <p class="text-[11px] text-slate-400">Nouvel adepte</p>
+                  </div>
+                  <div class="ml-auto flex items-center text-yellow-400 text-xs">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-200 flex-1">
+                  "Application simple, suivi en temps réel, service client réactif. C’est devenu mon fast-food de référence."
+                </p>
+                <p class="text-[11px] text-slate-400">
+                  <i class="fa-solid fa-calendar-day"></i> 1 novembre 2025
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mt-4">
+            <div class="swiper-pagination !static !w-auto"></div>
+            <div class="flex gap-2">
+              <button class="testimonials-prev w-8 h-8 rounded-full border border-slate-600 flex items-center justify-center text-xs hover:bg-slate-800">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button class="testimonials-next w-8 h-8 rounded-full border border-slate-600 flex items-center justify-center text-xs hover:bg-slate-800">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESSUS DE COMMANDE -->
+    <section id="process" class="py-16 bg-slate-950/90 border-t border-slate-800/80">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center mb-10">
+          <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Processus</p>
+          <h2 class="text-2xl sm:text-3xl font-bold">Commander n'a jamais été aussi simple</h2>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-stretch justify-between gap-6" data-aos="fade-up">
+          <div class="flex-1 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mb-1">
+              <span class="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-semibold">1</span>
+            </div>
+            <i class="fa-solid fa-utensils text-xl text-primary mb-1"></i>
+            <p class="font-semibold text-sm">Choisissez</p>
+            <p class="text-xs text-slate-300 max-w-xs">
+              Parcourez notre menu, filtrez, comparez, lisez les avis. Composez le combo parfait en quelques clics.
+            </p>
+          </div>
+          <div class="flex-1 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center mb-1">
+              <span class="w-6 h-6 rounded-full bg-secondary text-slate-900 text-xs flex items-center justify-center font-semibold">2</span>
+            </div>
+            <i class="fa-solid fa-credit-card text-xl text-secondary mb-1"></i>
+            <p class="font-semibold text-sm">Payez</p>
+            <p class="text-xs text-slate-300 max-w-xs">
+              Paiement sécurisé, CB, Apple Pay, Google Pay. Confirmation immédiate par mail et SMS.
+            </p>
+          </div>
+          <div class="flex-1 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center mb-1">
+              <span class="w-6 h-6 rounded-full bg-accent text-white text-xs flex items-center justify-center font-semibold">3</span>
+            </div>
+            <i class="fa-solid fa-truck-fast text-xl text-accent mb-1"></i>
+            <p class="font-semibold text-sm">Recevez</p>
+            <p class="text-xs text-slate-300 max-w-xs">
+              Suivez votre livraison en temps réel. Votre commande arrive chaude en moins de 30 minutes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZONE DE LIVRAISON -->
+    <section id="delivery" class="py-16 bg-slate-950">
+      <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div data-aos="fade-right">
+          <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Zone de livraison</p>
+          <h2 class="text-2xl sm:text-3xl font-bold mb-3">On vient jusqu'à vous</h2>
+          <p class="text-xs sm:text-sm text-slate-300 mb-5 max-w-md">
+            Nous livrons actuellement dans les quartiers suivants. Entrez votre code postal pour vérifier si nous couvrons votre adresse.
+          </p>
+
+          <ul class="text-xs sm:text-sm text-slate-200 mb-4 grid grid-cols-2 gap-y-1 max-w-sm">
+            <li><i class="fa-solid fa-location-dot text-primary"></i> Centre-ville</li>
+            <li><i class="fa-solid fa-location-dot text-primary"></i> Quartier Nord</li>
+            <li><i class="fa-solid fa-location-dot text-primary"></i> Quartier Sud</li>
+            <li><i class="fa-solid fa-location-dot text-primary"></i> Eco-parc</li>
+            <li><i class="fa-solid fa-location-dot text-primary"></i> Gare &amp; alentours</li>
+            <li><i class="fa-solid fa-location-dot text-primary"></i> Zone artisanale</li>
+          </ul>
+
+          <div class="space-y-3">
+            <div class="flex gap-2">
+              <input id="zipInput" type="text" maxlength="5" placeholder="Entrez votre code postal"
+                     class="flex-1 bg-slate-900/70 border border-slate-700 rounded-2xl px-4 py-2.5 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+              <button id="checkZipBtn" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-primary to-accent text-xs font-semibold hover:scale-[1.02] transition">
+                Vérifier
+              </button>
+            </div>
+            <p id="zipMessage" class="text-xs"></p>
+            <p class="text-[11px] text-slate-400">
+              <i class="fa-solid fa-clock text-secondary"></i> Temps moyen de livraison : <span id="deliveryTimeEstimate">25-35 min</span>
+            </p>
+          </div>
+        </div>
+
+        <div data-aos="fade-left">
+          <div class="relative rounded-3xl overflow-hidden shadow-glass glass">
+            <img src="https://images.unsplash.com/photo-1521292270410-a8c53642e9d0?auto=format&fit=crop&w=900&q=80"
+                 alt="Carte de livraison" class="w-full h-72 object-cover opacity-80" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4 text-xs text-slate-200">
+              <p class="font-semibold mb-1"><i class="fa-solid fa-map-location-dot text-primary"></i> Zones couvertes en temps réel</p>
+              <p class="text-[11px] text-slate-300">
+                Nous étendons régulièrement notre zone de livraison. Abonnez-vous à la newsletter pour être prévenu.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEWSLETTER + APP MOBILE -->
+    <section id="newsletter" class="py-16 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 border-t border-slate-800">
+      <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <!-- App -->
+        <div data-aos="fade-right" class="relative">
+          <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Application mobile</p>
+          <h2 class="text-2xl sm:text-3xl font-bold mb-3">Commandez encore plus vite avec l'app</h2>
+          <p class="text-xs sm:text-sm text-slate-300 mb-5 max-w-md">
+            Suivi en temps réel, historique de commandes, programmes de fidélité, offres exclusives. Tout tient dans votre poche.
+          </p>
+
+          <div class="relative inline-flex items-center gap-4 mt-2">
+            <div class="glass rounded-[32px] px-5 py-4 flex items-center gap-3">
+              <i class="fa-solid fa-mobile-screen-button text-2xl text-secondary"></i>
+              <div class="text-xs">
+                <p class="font-semibold">Téléchargez l'app</p>
+                <p class="text-[11px] text-slate-400">iOS &amp; Android</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 flex gap-3 text-xs">
+            <button class="px-4 py-2 rounded-2xl bg-slate-900 border border-slate-700 flex items-center gap-2 hover:bg-slate-800 transition">
+              <i class="fa-brands fa-apple text-lg"></i>
+              <span>App Store</span>
+            </button>
+            <button class="px-4 py-2 rounded-2xl bg-slate-900 border border-slate-700 flex items-center gap-2 hover:bg-slate-800 transition">
+              <i class="fa-brands fa-google-play text-lg"></i>
+              <span>Google Play</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Newsletter -->
+        <div data-aos="fade-left">
+          <div class="glass rounded-3xl p-6 sm:p-8 shadow-glass">
+            <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-1">Newsletter</p>
+            <h3 class="text-lg sm:text-xl font-semibold mb-2">Des offres qui donnent faim</h3>
+            <p class="text-xs sm:text-sm text-slate-300 mb-5">
+              Recevez -10% sur votre première commande et soyez les premiers informés des nouvelles recettes &amp; offres limitées.
+            </p>
+            <form id="newsletterForm" class="space-y-3">
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input type="email" id="newsletterEmail" required placeholder="Votre adresse email"
+                       class="flex-1 bg-slate-950/80 border border-slate-700 rounded-2xl px-4 py-2.5 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                <button type="submit" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-primary to-accent text-xs font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] transition">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span>S'abonner</span>
+                </button>
+              </div>
+              <p id="newsletterMessage" class="text-[11px] text-slate-300"></p>
+              <p class="text-[10px] text-slate-500">
+                En vous abonnant, vous acceptez de recevoir nos communications. Aucun spam, uniquement des bonnes nouvelles.
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="contact" class="bg-slate-950 border-t border-slate-800 pt-10 pb-4">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          <!-- Logo + social -->
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <i class="fa-solid fa-burger text-white"></i>
+              </div>
+              <div class="leading-tight">
+                <p class="font-extrabold text-lg">Fast<span class="text-primary">Food</span></p>
+                <p class="text-[11px] text-slate-400">Depuis 2023</p>
+              </div>
+            </div>
+            <p class="text-xs text-slate-300 mb-3">
+              Le fast-food nouvelle génération : rapide, transparent, ultra gourmand.
+            </p>
+            <div class="flex gap-2 text-xs">
+              <a href="#" class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary transition">
+                <i class="fa-brands fa-instagram"></i>
+              </a>
+              <a href="#" class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary transition">
+                <i class="fa-brands fa-facebook-f"></i>
+              </a>
+              <a href="#" class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary transition">
+                <i class="fa-brands fa-tiktok"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Liens rapides -->
+          <div>
+            <h4 class="text-sm font-semibold mb-3">Liens rapides</h4>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li><a href="#menu" class="hover:text-primary">Menu</a></li>
+              <li><a href="#process" class="hover:text-primary">Comment ça marche</a></li>
+              <li><a href="#delivery" class="hover:text-primary">Zones de livraison</a></li>
+              <li><a href="#" class="hover:text-primary">FAQ</a></li>
+              <li><a href="#" class="hover:text-primary">CGV</a></li>
+            </ul>
+          </div>
+
+          <!-- Contact -->
+          <div>
+            <h4 class="text-sm font-semibold mb-3">Contact</h4>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li class="flex items-start gap-2">
+                <i class="fa-solid fa-location-dot text-primary mt-[2px]"></i>
+                <span>12 rue du Gourmet, 75000 Paris</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <i class="fa-solid fa-phone text-primary"></i>
+                <a href="tel:+33123456789" class="hover:text-primary">+33 1 23 45 67 89</a>
+              </li>
+              <li class="flex items-center gap-2">
+                <i class="fa-solid fa-envelope text-primary"></i>
+                <a href="mailto:contact@fastfood.fr" class="hover:text-primary">contact@fastfood.fr</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Horaires -->
+          <div>
+            <h4 class="text-sm font-semibold mb-3">Horaires d'ouverture</h4>
+            <table class="w-full text-[11px] text-slate-300">
+              <tbody>
+                <tr>
+                  <td class="py-1 pr-2">Lun - Jeu</td>
+                  <td class="py-1 text-right">11h30 - 23h00</td>
+                </tr>
+                <tr>
+                  <td class="py-1 pr-2">Ven - Sam</td>
+                  <td class="py-1 text-right">11h30 - 01h00</td>
+                </tr>
+                <tr>
+                  <td class="py-1 pr-2">Dimanche</td>
+                  <td class="py-1 text-right">18h00 - 23h00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-800/80 pt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-[11px] text-slate-400">
+          <p>© 2025 FastFood. Tous droits réservés.</p>
+          <div class="flex flex-wrap items-center gap-4">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-credit-card"></i>
+              <span>CB, Visa, Mastercard, Apple Pay, Google Pay</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <a href="#" class="hover:text-primary">Mentions légales</a>
+              <a href="#" class="hover:text-primary">Politique de confidentialité</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      'use strict';
+
+      /**********************
+       * DATA PRODUITS
+       **********************/
+      const products = [
+        {
+          id: 'burger-1',
+          name: 'Smoky Double Cheese Burger',
+          description: 'Double steak, cheddar affiné, oignons caramélisés, sauce fumée maison.',
+          price: 11.9,
+          category: 'burger',
+          image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=600&q=80',
+          badge: 'PROMO -20%',
+          isNew: true,
+          rating: 4.9,
+          reviews: 328,
+          bestSeller: true
+        },
+        {
+          id: 'burger-2',
+          name: 'BBQ Bacon Lover',
+          description: 'Steak grillé, bacon croustillant, cheddar, sauce BBQ fumée.',
+          price: 10.5,
+          category: 'burger',
+          image: 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?auto=format&fit=crop&w=600&q=80',
+          badge: 'BEST-SELLER',
+          isNew: false,
+          rating: 4.8,
+          reviews: 412,
+          bestSeller: true
+        },
+        {
+          id: 'burger-3',
+          name: 'Veggie Green Delight',
+          description: 'Galette veggie maison, fromage, légumes grillés, sauce yaourt.',
+          price: 9.9,
+          category: 'burger',
+          image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80',
+          badge: 'VEGGIE',
+          isNew: false,
+          rating: 4.7,
+          reviews: 163,
+          bestSeller: false
+        },
+        {
+          id: 'tacos-1',
+          name: 'Tacos Poulet Fromage',
+          description: 'Poulet mariné, frites, sauce fromagère, crudités.',
+          price: 9.5,
+          category: 'tacos',
+          image: 'https://images.unsplash.com/photo-1601924582971-df4be9f9e51d?auto=format&fit=crop&w=600&q=80',
+          badge: 'NOUVEAU',
+          isNew: true,
+          rating: 4.8,
+          reviews: 210,
+          bestSeller: true
+        },
+        {
+          id: 'tacos-2',
+          name: 'Tacos Triple Viande',
+          description: 'Bœuf, poulet, merguez, frites, sauce au choix.',
+          price: 11.5,
+          category: 'tacos',
+          image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479c?auto=format&fit=crop&w=600&q=80',
+          badge: 'GOURMAND',
+          isNew: false,
+          rating: 4.6,
+          reviews: 134,
+          bestSeller: false
+        },
+        {
+          id: 'boisson-1',
+          name: 'Milkshake Oreo',
+          description: 'Milkshake crémeux à base de morceaux d’Oreo.',
+          price: 4.5,
+          category: 'boisson',
+          image: 'https://images.unsplash.com/photo-1572490122745-3694e1a6c1f7?auto=format&fit=crop&w=600&q=80',
+          badge: '-10%',
+          isNew: false,
+          rating: 4.9,
+          reviews: 189,
+          bestSeller: true
+        },
+        {
+          id: 'boisson-2',
+          name: 'Limonade Maison',
+          description: 'Citron jaune, citron vert, menthe fraîche, peu sucrée.',
+          price: 3.5,
+          category: 'boisson',
+          image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=600&q=80',
+          badge: 'MAISON',
+          isNew: false,
+          rating: 4.5,
+          reviews: 98,
+          bestSeller: false
+        },
+        {
+          id: 'dessert-1',
+          name: 'Brownie Chocolat Fondant',
+          description: 'Brownie maison, cœur fondant, éclats de noisettes.',
+          price: 4.2,
+          category: 'dessert',
+          image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80',
+          badge: 'INCONTOURNABLE',
+          isNew: false,
+          rating: 4.9,
+          reviews: 235,
+          bestSeller: true
+        },
+        {
+          id: 'dessert-2',
+          name: 'Cookie XXL',
+          description: 'Cookie géant, pépites de chocolat noir et lait.',
+          price: 3.9,
+          category: 'dessert',
+          image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80',
+          badge: 'XXL',
+          isNew: true,
+          rating: 4.7,
+          reviews: 120,
+          bestSeller: false
+        }
+      ];
+
+      const offerProduct = {
+        id: 'offer-mega-box',
+        name: 'Mega Burger Box -30%',
+        description: '2 burgers, 2 tacos, 2 desserts, 2 boissons.',
+        price: 27.9,
+        category: 'offre',
+        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80',
+        badge: 'OFFRE',
+        rating: 4.9,
+        reviews: 95,
+        bestSeller: true
+      };
+
+      /**********************
+       * DARK MODE
+       **********************/
+      const html = document.documentElement;
+      const storedTheme = localStorage.getItem('theme');
+      if (storedTheme === 'dark') {
+        html.classList.add('dark');
+      } else if (storedTheme === 'light') {
+        html.classList.remove('dark');
+      } else {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          html.classList.add('dark');
+        }
+      }
+
+      const toggleTheme = () => {
+        const isDark = html.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      };
+
+      const darkButtons = [
+        document.getElementById('darkModeToggle'),
+        document.getElementById('darkModeToggleMobile'),
+        document.getElementById('darkModeToggleMenu')
+      ].filter(Boolean);
+
+      darkButtons.forEach(btn => btn.addEventListener('click', toggleTheme));
+
+      /**********************
+       * NAVBAR & MOBILE MENU
+       **********************/
+      const navbar = document.getElementById('navbar');
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+
+      const updateNavbar = () => {
+        if (window.scrollY > 30) {
+          navbar.classList.add('backdrop-blur-xl', 'bg-slate-950/90', 'border-b', 'border-slate-800/80', 'shadow-lg');
+        } else {
+          navbar.classList.remove('backdrop-blur-xl', 'bg-slate-950/90', 'border-b', 'border-slate-800/80', 'shadow-lg');
+        }
+      };
+      updateNavbar();
+      window.addEventListener('scroll', updateNavbar);
+
+      mobileMenuBtn.addEventListener('click', () => {
+        const isOpen = mobileMenu.style.maxHeight && mobileMenu.style.maxHeight !== '0px';
+        mobileMenu.style.maxHeight = isOpen ? '0px' : mobileMenu.scrollHeight + 'px';
+      });
+
+      document.querySelectorAll('#mobileMenu a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.style.maxHeight = '0px';
+        });
+      });
+
+      /**********************
+       * SCROLL TOP BUTTON
+       **********************/
+      const scrollTopBtn = document.getElementById('scrollTopBtn');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+          scrollTopBtn.classList.remove('hidden');
+        } else {
+          scrollTopBtn.classList.add('hidden');
+        }
+      });
+      scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      /**********************
+       * COUNTERS
+       **********************/
+      const counters = document.querySelectorAll('.counter');
+      const ordersTodayCounter = document.getElementById('ordersTodayCounter');
+      const liveViewersCounter = document.getElementById('liveViewersCounter');
+
+      const animateCounter = (el, target, duration = 1500) => {
+        let start = 0;
+        const startTime = performance.now();
+        const step = (now) => {
+          const progress = Math.min((now - startTime) / duration, 1);
+          const value = Math.floor(progress * target);
+          el.textContent = value.toLocaleString('fr-FR');
+          if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            counters.forEach(counter => {
+              const target = parseInt(counter.dataset.target, 10) || 0;
+              animateCounter(counter, target);
+            });
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.3 });
+
+      if (counters.length) observer.observe(counters[0]);
+
+      animateCounter(ordersTodayCounter, 87);
+      animateCounter(liveViewersCounter, 142);
+
+      /**********************
+       * CART SYSTEM
+       **********************/
+      const cartKey = 'fastfood_cart';
+      const cartBtn = document.getElementById('cartBtn');
+      const cartCountBadge = document.getElementById('cartCountBadge');
+      const cartOverlay = document.getElementById('cartOverlay');
+      const cartPanel = document.getElementById('cartPanel');
+      const closeCartBtn = document.getElementById('closeCartBtn');
+      const cartItemsContainer = document.getElementById('cartItems');
+      const cartTotalEl = document.getElementById('cartTotal');
+      const cartItemsCountText = document.getElementById('cartItemsCountText');
+
+      const loadCart = () => {
+        try {
+          const stored = localStorage.getItem(cartKey);
+          return stored ? JSON.parse(stored) : [];
+        } catch {
+          return [];
+        }
+      };
+
+      let cart = loadCart();
+
+      const saveCart = () => {
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+      };
+
+      const findProduct = (id) => {
+        if (id === offerProduct.id) return offerProduct;
+        if (id === 'hero-burger') return products[0];
+        return products.find(p => p.id === id);
+      };
+
+      const formatPrice = (num) => `${num.toFixed(2).replace('.', ',')} €`;
+
+      const updateCartBadge = () => {
+        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCountBadge.textContent = count;
+        cartItemsCountText.textContent = count > 0
+          ? `${count} article${count > 1 ? 's' : ''} dans votre panier`
+          : 'Votre panier est vide';
+      };
+
+      const renderCart = () => {
+        cartItemsContainer.innerHTML = '';
+        if (cart.length === 0) {
+          cartItemsContainer.innerHTML = `
+            <div class="text-center text-xs text-slate-400 mt-6">
+              <p>Votre panier est vide.</p>
+              <a href="#menu" class="text-primary mt-2 inline-block">Découvrir le menu</a>
+            </div>`;
+        } else {
+          cart.forEach(item => {
+            const product = findProduct(item.id);
+            if (!product) return;
+            const div = document.createElement('div');
+            div.className = 'flex gap-3 text-xs';
+            div.innerHTML = `
+              <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
+                <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover" loading="lazy" />
+              </div>
+              <div class="flex-1">
+                <div class="flex justify-between items-start">
+                  <p class="font-semibold">${product.name}</p>
+                  <button class="text-slate-500 hover:text-accent remove-item" data-id="${item.id}" aria-label="Supprimer">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-1">${product.description.slice(0, 70)}...</p>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <button class="w-6 h-6 rounded-full border border-slate-600 flex items-center justify-center qty-btn" data-id="${item.id}" data-action="minus">
+                      <i class="fa-solid fa-minus text-[10px]"></i>
+                    </button>
+                    <span>${item.quantity}</span>
+                    <button class="w-6 h-6 rounded-full border border-slate-600 flex items-center justify-center qty-btn" data-id="${item.id}" data-action="plus">
+                      <i class="fa-solid fa-plus text-[10px]"></i>
+                    </button>
+                  </div>
+                  <span class="font-semibold text-slate-100">${formatPrice(product.price * item.quantity)}</span>
+                </div>
+              </div>
+            `;
+            cartItemsContainer.appendChild(div);
+          });
+        }
+        const total = cart.reduce((sum, item) => {
+          const product = findProduct(item.id);
+          return product ? sum + item.quantity * product.price : sum;
+        }, 0);
+        cartTotalEl.textContent = formatPrice(total);
+        updateCartBadge();
+      };
+
+      const openCart = () => {
+        cartOverlay.classList.remove('hidden');
+        cartPanel.classList.remove('translate-x-full');
+      };
+
+      const closeCart = () => {
+        cartOverlay.classList.add('hidden');
+        cartPanel.classList.add('translate-x-full');
+      };
+
+      cartBtn.addEventListener('click', () => openCart());
+      closeCartBtn.addEventListener('click', () => closeCart());
+      cartOverlay.addEventListener('click', () => closeCart());
+
+      cartItemsContainer.addEventListener('click', (e) => {
+        const removeBtn = e.target.closest('.remove-item');
+        const qtyBtn = e.target.closest('.qty-btn');
+        if (removeBtn) {
+          const id = removeBtn.dataset.id;
+          cart = cart.filter(item => item.id !== id);
+          saveCart();
+          renderCart();
+        } else if (qtyBtn) {
+          const id = qtyBtn.dataset.id;
+          const action = qtyBtn.dataset.action;
+          const item = cart.find(i => i.id === id);
+          if (!item) return;
+          if (action === 'plus') item.quantity += 1;
+          if (action === 'minus') item.quantity = Math.max(1, item.quantity - 1);
+          saveCart();
+          renderCart();
+        }
+      });
+
+      document.getElementById('clearCartBtn').addEventListener('click', () => {
+        cart = [];
+        saveCart();
+        renderCart();
+      });
+
+      document.getElementById('checkoutBtn').addEventListener('click', () => {
+        alert('Formulaire de paiement à intégrer (Shopify / provider de paiement).');
+      });
+
+      const addToCart = (productId, quantity = 1, imageEl = null) => {
+        const existing = cart.find(item => item.id === productId);
+        if (existing) {
+          existing.quantity += quantity;
+        } else {
+          cart.push({ id: productId, quantity });
+        }
+        saveCart();
+        renderCart();
+        animateCart();
+        if (imageEl) flyToCart(imageEl);
+      };
+
+      const animateCart = () => {
+        cartBtn.classList.add('animate-[shake_0.4s_ease]');
+        setTimeout(() => {
+          cartBtn.classList.remove('animate-[shake_0.4s_ease]');
+        }, 400);
+      };
+
+      const flyToCart = (imageEl) => {
+        const rect = imageEl.getBoundingClientRect();
+        const imgClone = imageEl.cloneNode(true);
+        imgClone.classList.add('fly-image');
+        imgClone.style.left = rect.left + 'px';
+        imgClone.style.top = rect.top + 'px';
+        imgClone.style.width = rect.width + 'px';
+        imgClone.style.height = rect.height + 'px';
+        document.body.appendChild(imgClone);
+        imgClone.addEventListener('animationend', () => imgClone.remove());
+      };
+
+      /**********************
+       * RENDER MENU
+       **********************/
+      const productsGrid = document.getElementById('productsGrid');
+      const productsSkeleton = document.getElementById('productsSkeleton');
+      const productsCountText = document.getElementById('productsCountText');
+
+      const createRatingStars = (rating) => {
+        let html = '';
+        const fullStars = Math.floor(rating);
+        const hasHalf = rating - fullStars >= 0.5;
+        for (let i = 0; i < fullStars; i++) html += '<i class="fa-solid fa-star"></i>';
+        if (hasHalf) html += '<i class="fa-solid fa-star-half-stroke"></i>';
+        const total = hasHalf ? fullStars + 1 : fullStars;
+        for (let i = total; i < 5; i++) html += '<i class="fa-regular fa-star"></i>';
+        return html;
+      };
+
+      const renderProducts = (filterCategory = 'all', searchTerm = '') => {
+        const term = searchTerm.toLowerCase().trim();
+        let filtered = products.slice();
+        if (filterCategory !== 'all') {
+          filtered = filtered.filter(p => p.category === filterCategory);
+        }
+        if (term) {
+          filtered = filtered.filter(p =>
+            p.name.toLowerCase().includes(term) ||
+            p.description.toLowerCase().includes(term)
+          );
+        }
+
+        productsCountText.textContent = `${filtered.length} produit${filtered.length > 1 ? 's' : ''} trouvés`;
+        productsGrid.innerHTML = '';
+
+        filtered.forEach((product, index) => {
+          const card = document.createElement('article');
+          card.className = 'group rounded-3xl overflow-hidden bg-slate-900/80 border border-slate-800 hover:border-primary/70 shadow-lg hover:shadow-primary/30 transition transform hover:-translate-y-1 flex flex-col';
+          card.setAttribute('data-aos', 'fade-up');
+          card.setAttribute('data-aos-delay', String(index * 50));
+
+          card.innerHTML = `
+            <div class="relative overflow-hidden">
+              <img src="${product.image}" alt="${product.name}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300 product-image" loading="lazy" />
+              ${
+                product.badge
+                  ? `<span class="absolute top-3 left-3 bg-primary text-[10px] font-semibold px-2 py-1 rounded-full shadow-lg">${product.badge}</span>`
+                  : ''
+              }
+              <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-900/80 flex items-center justify-center text-xs text-slate-200 hover:text-accent hover:scale-110 transition">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+            </div>
+            <div class="p-4 flex flex-col gap-3 flex-1">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-sm font-semibold">${product.name}</h3>
+                  <p class="text-[11px] text-slate-300 line-clamp-2">${product.description}</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-slate-300">
+                <div class="flex items-center gap-1 text-yellow-400">
+                  ${createRatingStars(product.rating)}
+                </div>
+                <span>${product.rating.toFixed(1)} • ${product.reviews} avis</span>
+              </div>
+              <div class="flex items-center justify-between mt-auto">
+                <div>
+                  <p class="text-xs text-slate-400">À partir de</p>
+                  <p class="text-xl font-bold text-primary">${formatPrice(product.price)}</p>
+                </div>
+                <button class="px-3 py-2 rounded-2xl bg-gradient-to-r from-primary to-accent text-[11px] font-semibold flex items-center gap-2 hover:scale-105 transition add-to-cart-btn"
+                        data-product-id="${product.id}">
+                  <i class="fa-solid fa-cart-plus"></i>
+                  Ajouter
+                </button>
+              </div>
+              <button class="mt-2 w-full text-[11px] text-slate-300 flex items-center justify-center gap-1 hover:text-primary transition view-product-details"
+                      data-product-id="${product.id}">
+                <i class="fa-solid fa-circle-info"></i> Détails du produit
+              </button>
+            </div>
+          `;
+
+          productsGrid.appendChild(card);
+        });
+
+        if (filtered.length === 0) {
+          productsGrid.innerHTML = `
+            <div class="col-span-full text-xs text-slate-300 text-center py-6">
+              Aucun produit ne correspond à votre recherche. Essayez un autre terme ou catégorie.
+            </div>`;
+        }
+
+        AOS.refresh();
+      };
+
+      setTimeout(() => {
+        productsSkeleton.classList.add('hidden');
+        productsGrid.classList.remove('hidden');
+        renderProducts();
+      }, 700);
+
+      /**********************
+       * FILTERS & SEARCH
+       **********************/
+      const filterButtons = document.querySelectorAll('.menu-filter-btn');
+      let currentCategory = 'all';
+
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterButtons.forEach(b => b.dataset.active = 'false');
+          btn.dataset.active = 'true';
+          currentCategory = btn.dataset.category;
+          renderProducts(currentCategory, searchInput.value);
+        });
+      });
+
+      const searchInput = document.getElementById('searchInput');
+      const searchSuggestions = document.getElementById('searchSuggestions');
+
+      const updateSuggestions = (value) => {
+        const term = value.toLowerCase().trim();
+        if (!term) {
+          searchSuggestions.classList.add('hidden');
+          searchSuggestions.innerHTML = '';
+          return;
+        }
+        const suggestions = products
+          .filter(p => p.name.toLowerCase().includes(term))
+          .slice(0, 5);
+
+        if (suggestions.length === 0) {
+          searchSuggestions.classList.add('hidden');
+          searchSuggestions.innerHTML = '';
+          return;
+        }
+
+        searchSuggestions.classList.remove('hidden');
+        searchSuggestions.innerHTML = suggestions.map(p =>
+          `<button class="w-full text-left px-4 py-2 hover:bg-slate-800/80 suggestion-item text-slate-200 text-xs" data-product-id="${p.id}">
+            ${p.name}
+          </button>`
+        ).join('');
+      };
+
+      searchInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        renderProducts(currentCategory, value);
+        updateSuggestions(value);
+      });
+
+      searchSuggestions.addEventListener('click', (e) => {
+        const suggestion = e.target.closest('.suggestion-item');
+        if (!suggestion) return;
+        const name = suggestion.textContent.trim();
+        searchInput.value = name;
+        searchSuggestions.classList.add('hidden');
+        searchSuggestions.innerHTML = '';
+        renderProducts('all', name);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!searchSuggestions.contains(e.target) && e.target !== searchInput) {
+          searchSuggestions.classList.add('hidden');
+        }
+      });
+
+      /**********************
+       * PRODUCT MODAL
+       **********************/
+      const productModalOverlay = document.getElementById('productModalOverlay');
+      const productModal = document.getElementById('productModal');
+      const closeProductModalBtn = document.getElementById('closeProductModalBtn');
+
+      const modalProductImage = document.getElementById('modalProductImage');
+      const modalProductBadge = document.getElementById('modalProductBadge');
+      const modalProductName = document.getElementById('modalProductName');
+      const modalProductDescription = document.getElementById('modalProductDescription');
+      const modalProductRating = document.getElementById('modalProductRating');
+      const modalProductReviews = document.getElementById('modalProductReviews');
+      const modalProductPrice = document.getElementById('modalProductPrice');
+      const modalStockLeft = document.getElementById('modalStockLeft');
+      const modalViewersCount = document.getElementById('modalViewersCount');
+      const modalAddToCartBtn = document.getElementById('modalAddToCartBtn');
+
+      let currentModalProductId = null;
+
+      const openProductModal = (productId) => {
+        const product = findProduct(productId);
+        if (!product) return;
+        currentModalProductId = productId;
+
+        modalProductImage.src = product.image;
+        modalProductImage.alt = product.name;
+        modalProductName.textContent = product.name;
+        modalProductDescription.textContent = product.description;
+        modalProductRating.innerHTML = createRatingStars(product.rating);
+        modalProductReviews.textContent = `${product.rating.toFixed(1)} • ${product.reviews} avis`;
+        modalProductPrice.textContent = formatPrice(product.price);
+        modalStockLeft.textContent = Math.floor(Math.random() * 5) + 3;
+        modalViewersCount.textContent = Math.floor(Math.random() * 80) + 60;
+        modalProductBadge.textContent = product.badge || 'BEST-SELLER';
+
+        productModalOverlay.classList.remove('hidden');
+        productModal.classList.remove('opacity-0');
+        productModal.classList.add('opacity-100');
+      };
+
+      const closeProductModal = () => {
+        productModalOverlay.classList.add('hidden');
+        productModal.classList.remove('opacity-100');
+        productModal.classList.add('opacity-0');
+      };
+
+      closeProductModalBtn.addEventListener('click', () => closeProductModal());
+      productModalOverlay.addEventListener('click', () => closeProductModal());
+
+      document.addEventListener('click', (e) => {
+        const detailsBtn = e.target.closest('.view-product-details');
+        if (detailsBtn) {
+          const id = detailsBtn.dataset.productId;
+          openProductModal(id);
+        }
+      });
+
+      modalAddToCartBtn.addEventListener('click', () => {
+        if (!currentModalProductId) return;
+        addToCart(currentModalProductId);
+      });
+
+      /**********************
+       * ADD TO CART BUTTONS
+       **********************/
+      document.addEventListener('click', (e) => {
+        const addBtn = e.target.closest('.add-to-cart-btn');
+        if (addBtn) {
+          const productId = addBtn.dataset.productId;
+          const card = addBtn.closest('article');
+          const img = card.querySelector('.product-image');
+          addToCart(productId, 1, img);
+        }
+      });
+
+      document.querySelectorAll('.add-to-cart-hero').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const heroCard = e.target.closest('.glass');
+          const img = heroCard.querySelector('img');
+          addToCart('hero-burger', 1, img);
+        });
+      });
+
+      document.querySelector('.add-offer-to-cart').addEventListener('click', (e) => {
+        const offerImg = document.querySelector('#offers img');
+        addToCart(offerProduct.id, 1, offerImg);
+      });
+
+      renderCart();
+
+      /**********************
+       * SWIPER (BEST SELLERS & TESTIMONIALS)
+       **********************/
+      const bestSellersWrapper = document.getElementById('bestSellersWrapper');
+      const bestSellers = products.filter(p => p.bestSeller || p.category === 'burger');
+
+      bestSellers.forEach(product => {
+        const slide = document.createElement('div');
+        slide.className = 'swiper-slide';
+        slide.innerHTML = `
+          <article class="rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-primary/70 transition shadow-lg hover:shadow-primary/30 flex flex-col">
+            <div class="relative overflow-hidden">
+              <img src="${product.image}" alt="${product.name}" class="w-full h-44 object-cover hover:scale-105 transition-transform duration-300" loading="lazy" />
+              <span class="absolute top-3 left-3 bg-primary text-[10px] font-semibold px-2 py-1 rounded-full shadow-lg">
+                ${product.badge || 'BEST-SELLER'}
+              </span>
+            </div>
+            <div class="p-4 flex flex-col gap-3 flex-1">
+              <div>
+                <h3 class="text-sm font-semibold">${product.name}</h3>
+                <p class="text-[11px] text-slate-300 line-clamp-2">${product.description}</p>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-slate-300">
+                <div class="flex items-center gap-1 text-yellow-400">
+                  ${createRatingStars(product.rating)}
+                </div>
+                <span>${product.rating.toFixed(1)} • ${product.reviews} avis</span>
+              </div>
+              <div class="flex items-center justify-between mt-auto">
+                <p class="text-xl font-bold text-primary">${formatPrice(product.price)}</p>
+                <button class="px-3 py-2 rounded-2xl bg-gradient-to-r from-primary to-accent text-[11px] font-semibold flex items-center gap-2 hover:scale-105 transition add-to-cart-btn"
+                        data-product-id="${product.id}">
+                  <i class="fa-solid fa-cart-plus"></i>
+                  Ajouter
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+        bestSellersWrapper.appendChild(slide);
+      });
+
+      AOS.init({
+        once: true,
+        duration: 600,
+        offset: 80
+      });
+
+      const initSwiper = () => {
+        new Swiper('.bestSellersSwiper', {
+          slidesPerView: 1.2,
+          spaceBetween: 14,
+          loop: true,
+          autoplay: {
+            delay: 2500,
+            disableOnInteraction: false
+          },
+          breakpoints: {
+            640: { slidesPerView: 2.2 },
+            1024: { slidesPerView: 3.2 }
+          },
+          pagination: {
+            el: '.bestSellersSwiper .swiper-pagination',
+            clickable: true
+          },
+          navigation: {
+            nextEl: '.best-sellers-next',
+            prevEl: '.best-sellers-prev'
+          }
+        });
+
+        new Swiper('.testimonialsSwiper', {
+          slidesPerView: 1.1,
+          spaceBetween: 14,
+          loop: true,
+          autoplay: {
+            delay: 3500,
+            disableOnInteraction: false
+          },
+          breakpoints: {
+            640: { slidesPerView: 2.2 },
+            1024: { slidesPerView: 3 }
+          },
+          pagination: {
+            el: '.testimonialsSwiper .swiper-pagination',
+            clickable: true
+          },
+          navigation: {
+            nextEl: '.testimonials-next',
+            prevEl: '.testimonials-prev'
+          }
+        });
+      };
+
+      setTimeout(initSwiper, 500);
+
+      /**********************
+       * COUNTDOWN OFFRE
+       **********************/
+      const countdownEl = {
+        days: document.getElementById('cd-days'),
+        hours: document.getElementById('cd-hours'),
+        minutes: document.getElementById('cd-minutes'),
+        seconds: document.getElementById('cd-seconds')
+      };
+
+      const countdownEnd = Date.now() + 3 * 24 * 60 * 60 * 1000; // 3 jours
+      const countdownInterval = setInterval(() => {
+        const now = Date.now();
+        let diff = countdownEnd - now;
+        if (diff <= 0) {
+          clearInterval(countdownInterval);
+          countdownEl.days.textContent = '00';
+          countdownEl.hours.textContent = '00';
+          countdownEl.minutes.textContent = '00';
+          countdownEl.seconds.textContent = '00';
+          return;
+        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        diff -= days * (1000 * 60 * 60 * 24);
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        diff -= hours * (1000 * 60 * 60);
+        const minutes = Math.floor(diff / (1000 * 60));
+        diff -= minutes * (1000 * 60);
+        const seconds = Math.floor(diff / 1000);
+
+        countdownEl.days.textContent = String(days).padStart(2, '0');
+        countdownEl.hours.textContent = String(hours).padStart(2, '0');
+        countdownEl.minutes.textContent = String(minutes).padStart(2, '0');
+        countdownEl.seconds.textContent = String(seconds).padStart(2, '0');
+      }, 1000);
+
+      /**********************
+       * ZIP CODE CHECK
+       **********************/
+      const zipInput = document.getElementById('zipInput');
+      const checkZipBtn = document.getElementById('checkZipBtn');
+      const zipMessage = document.getElementById('zipMessage');
+
+      const coveredZipPrefixes = ['75', '92', '93', '94'];
+
+      checkZipBtn.addEventListener('click', () => {
+        const zip = zipInput.value.trim();
+        if (!/^\d{5}$/.test(zip)) {
+          zipMessage.textContent = 'Veuillez entrer un code postal valide à 5 chiffres.';
+          zipMessage.className = 'text-xs text-red-400';
+          return;
+        }
+        const covered = coveredZipPrefixes.includes(zip.slice(0, 2));
+        if (covered) {
+          zipMessage.innerHTML = '<span class="text-green-400 font-semibold">Oui, nous livrons chez vous !</span> Préparez vos papilles 👀';
+          zipMessage.className = 'text-xs';
+        } else {
+          zipMessage.innerHTML = '<span class="text-accent font-semibold">Pas encore...</span> Mais nous étendons régulièrement notre zone. Restez connecté !';
+          zipMessage.className = 'text-xs';
+        }
+      });
+
+      /**********************
+       * NEWSLETTER
+       **********************/
+      const newsletterForm = document.getElementById('newsletterForm');
+      const newsletterEmail = document.getElementById('newsletterEmail');
+      const newsletterMessage = document.getElementById('newsletterMessage');
+
+      newsletterForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = newsletterEmail.value.trim();
+        if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+          newsletterMessage.textContent = 'Veuillez entrer une adresse email valide.';
+          newsletterMessage.className = 'text-[11px] text-red-400';
+          return;
+        }
+        newsletterMessage.textContent = 'Merci ! Vous venez de débloquer -10% sur votre prochaine commande 🎉';
+        newsletterMessage.className = 'text-[11px] text-green-400';
+        newsletterForm.reset();
+      });
+    });
+  </script>
+</body>
+</html>
