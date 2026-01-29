@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowSync - Portfolio & Présentation</title>
+    <meta name="description" content="Portfolio professionnel présentant notre SAAS innovant. Découvrez nos fonctionnalités, cas d'usage et démarrez votre essai gratuit." />
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#6366f1',
+              secondary: '#8b5cf6',
+              accent: '#ec4899',
+              dark: '#0f172a',
+            },
+            animation: {
+              'gradient': 'gradient 8s linear infinite',
+              'float': 'float 6s ease-in-out infinite',
+              'blob': 'blob 7s infinite',
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+              gradient: {
+                '0%, 100%': { backgroundPosition: '0% 50%' },
+                '50%': { backgroundPosition: '100% 50%' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-20px)' },
+              },
+              blob: {
+                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                '100%': { transform: 'translate(0px, 0px) scale(1)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        html { scroll-behavior: smooth; }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glow-button {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .glow-button:hover {
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        .blob {
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            filter: blur(40px);
+            opacity: 0.7;
+        }
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        
+        .card-tilt {
+            transition: transform 0.3s ease;
+        }
+        
+        .card-tilt:hover {
+            transform: perspective(1000px) rotateX(2deg) rotateY(2deg) scale(1.02);
+        }
+        
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        .animate-marquee {
+            animation: marquee 30s linear infinite;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+<!-- NAVBAR -->
+<nav id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-layer-group text-white"></i>
+                </div>
+                <span class="text-2xl font-bold gradient-text">FlowSync</span>
+            </div>
+            
+            <!-- Menu Desktop -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#features" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Fonctionnalités</a>
+                <a href="#pricing" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Tarifs</a>
+                <a href="#about" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">À propos</a>
+                <a href="#faq" class="nav-link text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">FAQ</a>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center space-x-4">
+                <button id="darkModeToggle" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+                <button class="hidden md:block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">
+                    Connexion
+                </button>
+                <button class="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg glow-button font-medium">
+                    Démarrer
+                </button>
+                <button id="mobileMenuBtn" class="md:hidden p-2">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden glass">
+        <div class="px-4 py-6 space-y-4">
+            <a href="#features" class="block text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Fonctionnalités</a>
+            <a href="#pricing" class="block text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Tarifs</a>
+            <a href="#about" class="block text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">À propos</a>
+            <a href="#faq" class="block text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">FAQ</a>
+            <button class="w-full px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg">
+                Connexion
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="relative min-h-screen flex items-center overflow-hidden pt-20">
+    <div id="particles-js"></div>
+    
+    <!-- Blobs animés -->
+    <div class="absolute top-20 left-10 w-72 h-72 bg-primary blob animate-blob"></div>
+    <div class="absolute bottom-20 right-10 w-96 h-96 bg-secondary blob animate-blob animation-delay-2000"></div>
+    <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-accent blob animate-blob animation-delay-4000"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <!-- Contenu gauche -->
+            <div data-aos="fade-right">
+                <div class="inline-flex items-center space-x-2 bg-gradient-to-r from-primary/20 to-secondary/20 px-4 py-2 rounded-full mb-6 animate-pulse-slow">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-sm font-medium">Nouveau : Version 2.0 disponible</span>
+                </div>
+                
+                <h1 class="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+                    Transformez votre 
+                    <span class="gradient-text">workflow</span>
+                    en quelques clics
+                </h1>
+                
+                <p class="text-xl text-gray-600 dark:text-gray-400 mb-8">
+                    La plateforme tout-en-un qui booste la productivité de votre équipe de 300%
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                    <button class="px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-lg glow-button font-semibold text-lg">
+                        <i class="fas fa-rocket mr-2"></i>
+                        Démarrer gratuitement
+                    </button>
+                    <button class="px-8 py-4 border-2 border-gray-300 dark:border-gray-700 rounded-lg hover:border-primary transition-colors font-semibold text-lg">
+                        <i class="fas fa-play-circle mr-2"></i>
+                        Voir la démo
+                    </button>
+                </div>
+                
+                <div class="flex flex-wrap gap-6 text-sm text-gray-600 dark:text-gray-400 mb-12">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                        <span>14 jours gratuits</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                        <span>Aucune CB requise</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                        <span>Annulation en 1 clic</span>
+                    </div>
+                </div>
+                
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-500 mb-4">Utilisé par 10,000+ entreprises</p>
+                    <div class="flex items-center space-x-6 opacity-60">
+                        <i class="fab fa-microsoft text-3xl"></i>
+                        <i class="fab fa-google text-3xl"></i>
+                        <i class="fab fa-amazon text-3xl"></i>
+                        <i class="fab fa-slack text-3xl"></i>
+                        <i class="fab fa-spotify text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Visuel droite -->
+            <div class="relative" data-aos="fade-left">
+                <div class="glass rounded-2xl p-8 shadow-2xl transform hover:scale-105 transition-transform duration-500">
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg p-6 relative overflow-hidden">
+                        <div class="absolute top-3 left-3 flex space-x-2">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
+                        <div class="mt-8 space-y-4">
+                            <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+                            <div class="h-4 bg-gray-700 rounded w-1/2"></div>
+                            <div class="grid grid-cols-3 gap-4 mt-6">
+                                <div class="h-24 bg-gradient-to-br from-primary to-secondary rounded-lg animate-pulse"></div>
+                                <div class="h-24 bg-gradient-to-br from-secondary to-accent rounded-lg animate-pulse" style="animation-delay: 0.2s"></div>
+                                <div class="h-24 bg-gradient-to-br from-accent to-primary rounded-lg animate-pulse" style="animation-delay: 0.4s"></div>
+                            </div>
+                            <div class="h-32 bg-gray-700 rounded-lg mt-4"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Éléments flottants -->
+                <div class="absolute -top-6 -right-6 glass rounded-xl p-4 animate-float">
+                    <div class="text-3xl font-bold gradient-text">+300%</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Productivité</div>
+                </div>
+                
+                <div class="absolute -bottom-6 -left-6 glass rounded-xl p-4 animate-float" style="animation-delay: 1s">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-star text-yellow-500"></i>
+                        <span class="text-2xl font-bold">4.9/5</span>
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">10K+ avis</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20" data-aos="fade-up">
+            <div class="text-center">
+                <div class="text-4xl font-bold gradient-text counter" data-target="500000">0</div>
+                <div class="text-gray-600 dark:text-gray-400 mt-2">Utilisateurs actifs</div>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl font-bold gradient-text counter" data-target="99.9">0</div>
+                <div class="text-gray-600 dark:text-gray-400 mt-2">% Uptime</div>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl font-bold gradient-text counter" data-target="150">0</div>
+                <div class="text-gray-600 dark:text-gray-400 mt-2">Pays couverts</div>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl font-bold gradient-text">4.9/5</div>
+                <div class="text-gray-600 dark:text-gray-400 mt-2">Note moyenne</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <i class="fas fa-chevron-down text-2xl text-gray-400"></i>
+    </div>
+</section>
+
+<!-- LOGOS CLIENTS -->
+<section class="py-20 bg-white dark:bg-gray-800 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-gray-500 dark:text-gray-400 mb-8">Ils nous font confiance</p>
+        <div class="flex space-x-12 animate-marquee">
+            <i class="fab fa-microsoft text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <i class="fab fa-google text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <i class="fab fa-amazon text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <i class="fab fa-apple text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <i class="fab fa-slack text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <i class="fab fa-spotify text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <i class="fab fa-dropbox text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <i class="fab fa-airbnb text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <!-- Duplication pour effet infini -->
+            <i class="fab fa-microsoft text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <i class="fab fa-google text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <i class="fab fa-amazon text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+            <i class="fab fa-apple text-5xl text-gray-400 hover:text-gray-600 transition-colors"></i>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES (Bento Grid) -->
+<section id="features" class="py-32 bg-gray-50 dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-20" data-aos="fade-up">
+            <h2 class="text-5xl font-bold mb-6">
+                Tout ce dont vous avez besoin, <span class="gradient-text">rien de plus</span>
+            </h2>
+            <p class="text-xl text-gray-600 dark:text-gray-400">
+                Des fonctionnalités puissantes conçues pour booster votre productivité
+            </p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Feature 1 - Large -->
+            <div class="lg:col-span-2 lg:row-span-2 glass rounded-2xl p-8 card-tilt hover:shadow-2xl transition-all" data-aos="fade-up">
+                <div class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-chart-line text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Dashboard Analytics</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    Visualisez vos données en temps réel avec des graphiques interactifs et des insights IA
+                </p>
+                <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-4 h-48">
+                    <div class="h-full flex items-end justify-between space-x-2">
+                        <div class="w-1/6 bg-gradient-to-t from-primary to-primary/50 rounded-t-lg" style="height: 60%"></div>
+                        <div class="w-1/6 bg-gradient-to-t from-secondary to-secondary/50 rounded-t-lg" style="height: 80%"></div>
+                        <div class="w-1/6 bg-gradient-to-t from-accent to-accent/50 rounded-t-lg" style="height: 45%"></div>
+                        <div class="w-1/6 bg-gradient-to-t from-primary to-primary/50 rounded-t-lg" style="height: 90%"></div>
+                        <div class="w-1/6 bg-gradient-to-t from-secondary to-secondary/50 rounded-t-lg" style="height: 70%"></div>
+                        <div class="w-1/6 bg-gradient-to-t from-accent to-accent/50 rounded-t-lg" style="height: 55%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="glass rounded-2xl p-8 card-tilt hover:shadow-2xl transition-all" data-aos="fade-up" data-aos-delay="100">
+                <div class="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-users text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Collaboration</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Travaillez en équipe avec des outils de collaboration en temps réel
+                </p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="glass rounded-2xl p-8 card-tilt hover:shadow-2xl transition-all" data-aos="fade-up" data-aos-delay="200">
+                <div class="w-16 h-16 bg-gradient-to-br from-accent to-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-plug text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Intégrations</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Connectez vos outils favoris via notre API puissante
+                </p>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="lg:col-span-2 glass rounded-2xl p-8 card-tilt hover:shadow-2xl transition-all" data-aos="fade-up" data-aos-delay="300">
+                <div class="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Sécurité & Conformité</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    Vos données sont protégées avec un chiffrement de niveau militaire
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <span class="px-4 py-2 bg-green-500/20 text-green-600 dark:text-green-400 rounded-full text-sm font-medium">ISO 27001</span>
+                    <span class="px-4 py-2 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium">GDPR</span>
+                    <span class="px-4 py-2 bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded-full text-sm font-medium">SOC 2</span>
+                </div>
+            </div>
+            
+            <!-- Feature 5 -->
+            <div class="glass rounded-2xl p-8 card-tilt hover:shadow-2xl transition-all" data-aos="fade-up" data-aos-delay="100">
+                <div class="w-16 h-16 bg-gradient-to-br from-secondary to-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-robot text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Automatisations</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Automatisez vos tâches répétitives et gagnez du temps
+                </p>
+            </div>
+            
+            <!-- Feature 6 -->
+            <div class="glass rounded-2xl p-8 card-tilt hover:shadow-2xl transition-all" data-aos="fade-up" data-aos-delay="200">
+                <div class="w-16 h-16 bg-gradient-to-br from-accent to-secondary rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Rapports</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Créez des rapports personnalisés en quelques clics
+                </p>
+            </div>
+            
+            <!-- Feature 7 -->
+            <div class="glass rounded-2xl p-8 card-tilt hover:shadow-2xl transition-all" data-aos="fade-up" data-aos-delay="300">
+                <div class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-headset text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Support 24/7</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Notre équipe est disponible à tout moment pour vous aider
+                </p>
+            </div>
+            
+            <!-- Feature 8 -->
+            <div class="glass rounded-2xl p-8 card-tilt hover:shadow-2xl transition-all" data-aos="fade-up" data-aos-delay="400">
+                <div class="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-mobile-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Mobile Apps</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Accédez à vos données partout avec nos apps iOS et Android
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="py-32 bg-white dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-20" data-aos="fade-up">
+            <h2 class="text-5xl font-bold mb-6">
+                En <span class="gradient-text">3 étapes</span> simples
+            </h2>
+            <p class="text-xl text-gray-600 dark:text-gray-400">
+                Commencez en quelques minutes, sans friction
+            </p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-12">
+            <div class="text-center" data-aos="fade-up">
+                <div class="relative mb-8">
+                    <div class="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                        <span class="text-4xl font-bold text-white">1</span>
+                    </div>
+                    <div class="hidden md:block absolute top-12 left-1/2 w-full h-1 bg-gradient-to-r from-primary to-transparent"></div>
+                </div>
+                <div class="glass rounded-2xl p-8">
+                    <i class="fas fa-user-plus text-4xl text-primary mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-4">Inscription</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Créez votre compte en 60 secondes. Email et mot de passe suffisent.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                <div class="relative mb-8">
+                    <div class="w-24 h-24 bg-gradient-to-br from-secondary to-accent rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                        <span class="text-4xl font-bold text-white">2</span>
+                    </div>
+                    <div class="hidden md:block absolute top-12 left-1/2 w-full h-1 bg-gradient-to-r from-secondary to-transparent"></div>
+                </div>
+                <div class="glass rounded-2xl p-8">
+                    <i class="fas fa-cog text-4xl text-secondary mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-4">Configuration</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Personnalisez votre espace et connectez vos outils en 5 minutes.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="text-center" data-aos="fade-up" data-aos-delay="400">
+                <div class="relative mb-8">
+                    <div class="w-24 h-24 bg-gradient-to-br from-accent to-primary rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                        <span class="text-4xl font-bold text-white">3</span>
+                    </div>
+                </div>
+                <div class="glass rounded-2xl p-8">
+                    <i class="fas fa-rocket text-4xl text-accent mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-4">Résultats</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Gagnez du temps immédiatement et boostez votre productivité.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="py-32 bg-gray-50 dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-20" data-aos="fade-up">
+            <h2 class="text-5xl font-bold mb-6">
+                Ce que disent <span class="gradient-text">nos utilisateurs</span>
+            </h2>
+            <p class="text-xl text-gray-600 dark:text-gray-400">
+                Plus de 10,000 avis 5 étoiles sur toutes les plateformes
+            </p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="glass rounded-2xl p-8 hover:scale-105 transition-transform" data-aos="fade-up">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full mr-4"></div>
+                    <div>
+                        <div class="font-bold">Sarah Martin</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">CEO, TechCorp</div>
+                    </div>
+                </div>
+                <div class="flex mb-4">
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 italic mb-4">
+                    "FlowSync a révolutionné notre façon de travailler. Nous avons gagné 40% de temps sur nos processus."
+                </p>
+                <div class="flex items-center text-sm text-green-600 dark:text-green-400">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span>Utilisateur vérifié</span>
+                </div>
+            </div>
+            
+            <div class="glass rounded-2xl p-8 hover:scale-105 transition-transform" data-aos="fade-up" data-aos-delay="200">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-secondary to-accent rounded-full mr-4"></div>
+                    <div>
+                        <div class="font-bold">Marc Dubois</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">CTO, StartupXYZ</div>
+                    </div>
+                </div>
+                <div class="flex mb-4">
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 italic mb-4">
+                    "L'interface est intuitive et les fonctionnalités sont exactement ce dont nous avions besoin. Bravo!"
+                </p>
+                <div class="flex items-center text-sm text-green-600 dark:text-green-400">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span>Utilisateur vérifié</span>
+                </div>
+            </div>
+            
+            <div class="glass rounded-2xl p-8 hover:scale-105 transition-transform" data-aos="fade-up" data-aos-delay="400">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-accent to-primary rounded-full mr-4"></div>
+                    <div>
+                        <div class="font-bold">Julie Chen</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Product Manager, InnovateCo</div>
+                    </div>
+                </div>
+                <div class="flex mb-4">
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <i class="fas fa-star text-yellow-500"></i>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 italic mb-4">
+                    "Le support client est exceptionnel. Chaque question obtient une réponse en moins de 2 heures."
+                </p>
+                <div class="flex items-center text-sm text-green-600 dark:text-green-400">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span>Utilisateur vérifié</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="py-32 bg-white dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12" data-aos="fade-up">
+            <h2 class="text-5xl font-bold mb-6">
+                Des tarifs <span class="gradient-text">transparents</span>
+            </h2>
+            <p class="text-xl text-gray-600 dark:text-gray-400 mb-8">
+                Choisissez le plan qui correspond à vos besoins
+            </p>
+            
+            <!-- Toggle Annual/Monthly -->
+            <div class="inline-flex items-center space-x-4 bg-gray-100 dark:bg-gray-900 rounded-full p-2">
+                <button class="px-6 py-2 rounded-full transition-all" id="monthlyBtn">Mensuel</button>
+                <button class="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-full transition-all" id="annualBtn">
+                    Annuel <span class="text-sm ml-1">(- 20%)</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8 mt-12">
+            <!-- Plan Starter -->
+            <div class="glass rounded-2xl p-8 hover:scale-105 transition-transform" data-aos="fade-up">
+                <div class="text-sm font-semibold text-primary mb-4">STARTER</div>
+                <div class="mb-6">
+                    <span class="text-5xl font-bold">Gratuit</span>
+                </div>
+                <div class="inline-block px-4 py-2 bg-green-500/20 text-green-600 dark:text-green-400 rounded-full text-sm font-medium mb-6">
+                    Gratuit pour toujours
+                </div>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                        <span>Jusqu'à 5 utilisateurs</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                        <span>5 Go de stockage</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                        <span>Fonctionnalités de base</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
+                        <span>Support par email</span>
+                    </li>
+                </ul>
+                <button class="w-full px-6 py-3 border-2 border-gray-300 dark:border-gray-700 rounded-lg hover:border-primary transition-colors font-semibold">
+                    Commencer gratuitement
+                </button>
+            </div>
+            
+            <!-- Plan Pro - POPULAIRE -->
+            <div class="glass rounded-2xl p-8 relative border-2 border-primary transform scale-105 shadow-2xl" data-aos="fade-up" data-aos-delay="200">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-full text-sm font-semibold shadow-lg">
+                    ⭐ LE PLUS CHOISI
+                </div>
+                <div class="text-sm font-semibold text-primary mb-4 mt-4">PRO</div>
+                <div class="mb-6">
+                    <span class="text-5xl font-bold">29€</span>
+                    <span class="text-gray-600 dark:text-gray-400">/mois</span>
+                </div>
+                <div class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                    ou 23€/mois facturé annuellement
+                </div>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>Utilisateurs illimités</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>100 Go de stockage</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>Toutes les fonctionnalités</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>Support prioritaire 24/7</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>API & Intégrations avancées</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>Rapports personnalisés</span>
+                    </li>
+                </ul>
+                <button class="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg glow-button font-semibold">
+                    Démarrer l'essai gratuit
+                </button>
+            </div>
+            
+            <!-- Plan Enterprise -->
+            <div class="glass rounded-2xl p-8 hover:scale-105 transition-transform" data-aos="fade-up" data-aos-delay="400">
+                <div class="text-sm font-semibold text-primary mb-4">ENTERPRISE</div>
+                <div class="mb-6">
+                    <span class="text-5xl font-bold">Sur mesure</span>
+                </div>
+                <div class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                    Contactez-nous pour un devis
+                </div>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>Tout du plan Pro +</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>Stockage illimité</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>SLA personnalisé</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>Gestionnaire de compte dédié</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>Formation sur mesure</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mr-3 mt-1"></i>
+                        <span>Déploiement on-premise</span>
+                    </li>
+                </ul>
+                <button class="w-full px-6 py-3 border-2 border-gray-300 dark:border-gray-700 rounded-lg hover:border-primary transition-colors font-semibold">
+                    Contactez les ventes
+                </button>
+            </div>
+        </div>
+        
+        <div class="text-center mt-12" data-aos="fade-up">
+            <a href="#" class="text-primary hover:underline font-medium">
+                Comparer tous les plans en détail →
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="py-32 bg-gray-50 dark:bg-gray-900">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-20" data-aos="fade-up">
+            <h2 class="text-5xl font-bold mb-6">
+                Questions <span class="gradient-text">fréquentes</span>
+            </h2>
+            <p class="text-xl text-gray-600 dark:text-gray-400">
+                Tout ce que vous devez savoir
+            </p>
+        </div>
+        
+        <div class="space-y-4">
+            <div class="glass rounded-xl overflow-hidden faq-item" data-aos="fade-up">
+                <button class="w-full px-8 py-6 flex justify-between items-center text-left hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors faq-question">
+                    <span class="font-semibold text-lg">Comment fonctionne l'essai gratuit ?</span>
+                    <i class="fas fa-plus text-primary transition-transform"></i>
+                </button>
+                <div class="faq-answer px-8 pb-6 text-gray-600 dark:text-gray-400 hidden">
+                    L'essai gratuit dure 14 jours et vous donne accès à toutes les fonctionnalités du plan Pro. Aucune carte bancaire n'est requise pour commencer. À la fin de l'essai, vous pouvez choisir de passer à un plan payant ou continuer avec le plan gratuit.
+                </div>
+            </div>
+            
+            <div class="glass rounded-xl overflow-hidden faq-item" data-aos="fade-up" data-aos-delay="100">
+                <button class="w-full px-8 py-6 flex justify-between items-center text-left hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors faq-question">
+                    <span class="font-semibold text-lg">Puis-je changer de plan à tout moment ?</span>
+                    <i class="fas fa-plus text-primary transition-transform"></i>
+                </button>
+                <div class="faq-answer px-8 pb-6 text-gray-600 dark:text-gray-400 hidden">
+                    Oui, vous pouvez upgrader ou downgrader votre plan à tout moment. Les changements prennent effet immédiatement et nous calculons automatiquement le prorata pour votre facturation.
+                </div>
+            </div>
+            
+            <div class="glass rounded-xl overflow-hidden faq-item" data-aos="fade-up" data-aos-delay="200">
+                <button class="w-full px-8 py-6 flex justify-between items-center text-left hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors faq-question">
+                    <span class="font-semibold text-lg">Mes données sont-elles sécurisées ?</span>
+                    <i class="fas fa-plus text-primary transition-transform"></i>
+                </button>
+                <div class="faq-answer px-8 pb-6 text-gray-600 dark:text-gray-400 hidden">
+                    Absolument. Nous utilisons un chiffrement AES-256 pour toutes vos données. Nous sommes conformes aux normes ISO 27001, GDPR et SOC 2. Vos données sont sauvegardées quotidiennement et stockées dans des centres de données sécurisés.
+                </div>
+            </div>
+            
+            <div class="glass rounded-xl overflow-hidden faq-item" data-aos="fade-up" data-aos-delay="300">
+                <button class="w-full px-8 py-6 flex justify-between items-center text-left hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors faq-question">
+                    <span class="font-semibold text-lg">Proposez-vous une formation ?</span>
+                    <i class="fas fa-plus text-primary transition-transform"></i>
+                </button>
+                <div class="faq-answer px-8 pb-6 text-gray-600 dark:text-gray-400 hidden">
+                    Oui! Nous offrons des webinaires gratuits chaque semaine pour tous les utilisateurs. Les clients Enterprise bénéficient de sessions de formation personnalisées avec un expert dédié.
+                </div>
+            </div>
+            
+            <div class="glass rounded-xl overflow-hidden faq-item" data-aos="fade-up" data-aos-delay="400">
+                <button class="w-full px-8 py-6 flex justify-between items-center text-left hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors faq-question">
+                    <span class="font-semibold text-lg">Comment fonctionne le support client ?</span>
+                    <i class="fas fa-plus text-primary transition-transform"></i>
+                </button>
+                <div class="faq-answer px-8 pb-6 text-gray-600 dark:text-gray-400 hidden">
+                    Notre équipe support est disponible 24/7 par email et chat. Les clients Pro et Enterprise bénéficient d'un support prioritaire avec des temps de réponse garantis de moins de 2 heures.
+                </div>
+            </div>
+            
+            <div class="glass rounded-xl overflow-hidden faq-item" data-aos="fade-up" data-aos-delay="500">
+                <button class="w-full px-8 py-6 flex justify-between items-center text-left hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors faq-question">
+                    <span class="font-semibold text-lg">Puis-je exporter mes données ?</span>
+                    <i class="fas fa-plus text-primary transition-transform"></i>
+                </button>
+                <div class="faq-answer px-8 pb-6 text-gray-600 dark:text-gray-400 hidden">
+                    Bien sûr. Vous pouvez exporter toutes vos données à tout moment en un clic. Nous supportons les formats CSV, JSON et Excel pour une compatibilité maximale.
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-12" data-aos="fade-up">
+            <p class="text-gray-600 dark:text-gray-400 mb-4">Vous avez une autre question ?</p>
+            <button class="px-8 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg glow-button font-semibold">
+                <i class="fas fa-envelope mr-2"></i>
+                Contactez-nous
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="py-32 bg-gradient-to-br from-primary via-secondary to-accent relative overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <div class="absolute top-20 left-20 w-96 h-96 bg-white rounded-full blur-3xl animate-blob"></div>
+        <div class="absolute bottom-20 right-20 w-80 h-80 bg-white rounded-full blur-3xl animate-blob" style="animation-delay: 2s"></div>
+    </div>
+    
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <div data-aos="zoom-in">
+            <h2 class="text-5xl lg:text-6xl font-bold text-white mb-6">
+                Prêt à transformer votre workflow ?
+            </h2>
+            <p class="text-2xl text-white/90 mb-12">
+                Rejoignez 500,000+ utilisateurs satisfaits aujourd'hui
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-6 justify-center mb-8">
+                <button class="px-10 py-5 bg-white text-primary rounded-lg hover:bg-gray-100 transition-all font-bold text-lg shadow-2xl hover:scale-105">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Démarrer gratuitement
+                </button>
+                <button class="px-10 py-5 border-2 border-white text-white rounded-lg hover:bg-white hover:text-primary transition-all font-bold text-lg hover:scale-105">
+                    <i class="fas fa-play-circle mr-2"></i>
+                    Voir la démo
+                </button>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-6 text-white/90">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span>14 jours gratuits</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Aucune CB requise</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Annulation en 1 clic</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="about" class="bg-gray-900 text-gray-300 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-5 gap-12 mb-12">
+            <!-- Logo & Tagline -->
+            <div class="md:col-span-2">
+                <div class="flex items-center space-x-2 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-layer-group text-white"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-white">FlowSync</span>
+                </div>
+                <p class="text-gray-400 mb-6">
+                    La plateforme tout-en-un qui transforme votre façon de travailler. Plus rapide, plus simple, plus puissant.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-colors">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-colors">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-colors">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Produit -->
+            <div>
+                <h4 class="text-white font-semibold mb-4">Produit</h4>
+                <ul class="space-y-3">
+                    <li><a href="#features" class="hover:text-white transition-colors">Fonctionnalités</a></li>
+                    <li><a href="#pricing" class="hover:text-white transition-colors">Tarifs</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Changelog</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Roadmap</a></li>
+                </ul>
+            </div>
+            
+            <!-- Resources -->
+            <div>
+                <h4 class="text-white font-semibold mb-4">Resources</h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">API</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Support</a></li>
+                </ul>
+            </div>
+            
+            <!-- Entreprise -->
+            <div>
+                <h4 class="text-white font-semibold mb-4">Entreprise</h4>
+                <ul class="space-y-3">
+                    <li><a href="#about" class="hover:text-white transition-colors">À propos</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Carrières</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Presse</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Bottom bar -->
+        <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div class="text-sm text-gray-500">
+                © 2025 FlowSync. Tous droits réservés.
+            </div>
+            
+            <div class="flex items-center space-x-6 text-sm">
+                <a href="#" class="hover:text-white transition-colors">CGU</a>
+                <a href="#" class="hover:text-white transition-colors">Confidentialité</a>
+                <a href="#" class="hover:text-white transition-colors">Cookies</a>
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span>Tous les systèmes opérationnels</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast glass text-white">
+    <div class="flex items-center">
+        <i class="fas fa-check-circle text-green-500 mr-3 text-xl"></i>
+        <span id="toastMessage">Action effectuée avec succès!</span>
+    </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+// Init AOS
+AOS.init({
+    duration: 800,
+    once: true,
+    offset: 100
+});
+
+// Particles.js configuration
+particlesJS('particles-js', {
+    particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: '#6366f1' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.5, random: false },
+        size: { value: 3, random: true },
+        line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#6366f1',
+            opacity: 0.4,
+            width: 1
+        },
+        move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false
+        }
+    },
+    interactivity: {
+        detect_on: 'canvas',
+        events: {
+            onhover: { enable: true, mode: 'grab' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+        },
+        modes: {
+            grab: { distance: 140, line_linked: { opacity: 1 } },
+            push: { particles_nb: 4 }
+        }
+    },
+    retina_detect: true
+});
+
+// Dark Mode Toggle
+const darkModeToggle = document.getElementById('darkModeToggle');
+const html = document.documentElement;
+
+// Check for saved theme preference or default to 'light'
+const currentTheme = localStorage.getItem('theme') || 'light';
+if (currentTheme === 'dark') {
+    html.classList.add('dark');
+}
+
+darkModeToggle.addEventListener('click', () => {
+    html.classList.toggle('dark');
+    const theme = html.classList.contains('dark') ? 'dark' : 'light';
+    localStorage.setItem('theme', theme);
+    
+    showToast(theme === 'dark' ? 'Mode sombre activé' : 'Mode clair activé');
+});
+
+// Navbar Scroll Effect
+const navbar = document.getElementById('navbar');
+let lastScroll = 0;
+
+window.addEventListener('scroll', () => {
+    const currentScroll = window.pageYOffset;
+    
+    if (currentScroll > 100) {
+        navbar.classList.add('glass', 'shadow-lg');
+        navbar.classList.remove('bg-transparent');
+    } else {
+        navbar.classList.remove('glass', 'shadow-lg');
+    }
+    
+    // Hide/show on scroll
+    if (currentScroll > lastScroll && currentScroll > 500) {
+        navbar.style.transform = 'translateY(-100%)';
+    } else {
+        navbar.style.transform = 'translateY(0)';
+    }
+    
+    lastScroll = currentScroll;
+});
+
+// Mobile Menu Toggle
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+
+mobileMenuBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+});
+
+// Close mobile menu on link click
+document.querySelectorAll('#mobileMenu a').forEach(link => {
+    link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+    });
+});
+
+// Smooth Scroll for Anchor Links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            const offset = 80;
+            const targetPosition = target.offsetTop - offset;
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+
+// Active Section Indicator
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+
+window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (pageYOffset >= sectionTop - 200) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('text-primary', 'font-semibold');
+        if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('text-primary', 'font-semibold');
+        }
+    });
+});
+
+// Animated Counters
+const counters = document.querySelectorAll('.counter');
+const speed = 200;
+
+const animateCounter = (counter) => {
+    const target = parseFloat(counter.getAttribute('data-target'));
+    const increment = target / speed;
+    let current = 0;
+
+    const updateCounter = () => {
+        current += increment;
+        if (current < target) {
+            counter.textContent = Math.ceil(current).toLocaleString();
+            setTimeout(updateCounter, 10);
+        } else {
+            // Handle decimal for 99.9%
+            if (target % 1 !== 0) {
+                counter.textContent = target.toFixed(1);
+            } else {
+                counter.textContent = target.toLocaleString() + '+';
+            }
+        }
+    };
+
+    updateCounter();
+};
+
+// Intersection Observer for Counters
+const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animateCounter(entry.target);
+            counterObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.5 });
+
+counters.forEach(counter => {
+    counterObserver.observe(counter);
+});
+
+// FAQ Accordion
+const faqItems = document.querySelectorAll('.faq-item');
+
+faqItems.forEach(item => {
+    const question = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
+    const icon = question.querySelector('i');
+
+    question.addEventListener('click', () => {
+        const isOpen = !answer.classList.contains('hidden');
+        
+        // Close all other items
+        faqItems.forEach(otherItem => {
+            const otherAnswer = otherItem.querySelector('.faq-answer');
+            const otherIcon = otherItem.querySelector('.faq-question i');
+            otherAnswer.classList.add('hidden');
+            otherIcon.classList.remove('fa-minus', 'rotate-180');
+            otherIcon.classList.add('fa-plus');
+        });
+
+        // Toggle current item
+        if (!isOpen) {
+            answer.classList.remove('hidden');
+            icon.classList.remove('fa-plus');
+            icon.classList.add('fa-minus', 'rotate-180');
+        }
+    });
+});
+
+// Pricing Toggle (Annual/Monthly)
+const monthlyBtn = document.getElementById('monthlyBtn');
+const annualBtn = document.getElementById('annualBtn');
+
+monthlyBtn.addEventListener('click', () => {
+    monthlyBtn.classList.add('bg-gradient-to-r', 'from-primary', 'to-secondary', 'text-white');
+    annualBtn.classList.remove('bg-gradient-to-r', 'from-primary', 'to-secondary', 'text-white');
+    showToast('Affichage des tarifs mensuels');
+});
+
+annualBtn.addEventListener('click', () => {
+    annualBtn.classList.add('bg-gradient-to-r', 'from-primary', 'to-secondary', 'text-white');
+    monthlyBtn.classList.remove('bg-gradient-to-r', 'from-primary', 'to-secondary', 'text-white');
+    showToast('Affichage des tarifs annuels - Économisez 20%!');
+});
+
+// Toast Notification
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    
+    toastMessage.textContent = message;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// CTA Buttons with Toast
+document.querySelectorAll('button').forEach(button => {
+    if (button.textContent.includes('Démarrer') || button.textContent.includes('essai')) {
+        button.addEventListener('click', (e) => {
+            if (!button.id && !button.classList.contains('faq-question')) {
+                e.preventDefault();
+                showToast('🚀 Redirection vers la page d\'inscription...');
+            }
+        });
+    }
+});
+
+// Form Validation (Newsletter example)
+const newsletterForms = document.querySelectorAll('form');
+newsletterForms.forEach(form => {
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        showToast('✉️ Merci! Vous êtes inscrit à notre newsletter');
+        form.reset();
+    });
+});
+
+// 3D Tilt Effect on Cards (subtle)
+const tiltCards = document.querySelectorAll('.card-tilt');
+
+tiltCards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 20;
+        const rotateY = (centerX - x) / 20;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    });
+    
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+    });
+});
+
+// Lazy Loading Images
+if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.remove('lazy');
+                imageObserver.unobserve(img);
+            }
+        });
+    });
+
+    const lazyImages = document.querySelectorAll('img.lazy');
+    lazyImages.forEach(img => imageObserver.observe(img));
+}
+
+// Performance: Debounce scroll events
+function debounce(func, wait = 10, immediate = true) {
+    let timeout;
+    return function() {
+        const context = this, args = arguments;
+        const later = function() {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        const callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+}
+
+// Console Easter Egg
+console.log('%c🚀 FlowSync - Nous recrutons!', 'color: #6366f1; font-size: 20px; font-weight: bold;');
+console.log('%cVous êtes développeur? Rejoignez notre équipe: careers@flowsync.com', 'color: #8b5cf6; font-size: 14px;');
+
+// Prevent right-click on production (optional)
+// document.addEventListener('contextmenu', e => e.preventDefault());
+
+// Analytics Simulation (replace with real analytics)
+function trackEvent(category, action, label) {
+    console.log(`Analytics: ${category} - ${action} - ${label}`);
+    // window.gtag('event', action, { 'event_category': category, 'event_label': label });
+}
+
+// Track CTA clicks
+document.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', () => {
+        trackEvent('CTA', 'click', button.textContent.trim());
+    });
+});
+
+// Scroll Progress Indicator (optional)
+const scrollProgress = document.createElement('div');
+scrollProgress.style.cssText = 'position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899); z-index: 9999; transition: width 0.1s;';
+document.body.appendChild(scrollProgress);
+
+window.addEventListener('scroll', () => {
+    const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (window.scrollY / windowHeight) * 100;
+    scrollProgress.style.width = scrolled + '%';
+});
+
+// Keyboard Navigation Improvements
+document.addEventListener('keydown', (e) => {
+    // ESC to close mobile menu
+    if (e.key === 'Escape') {
+        mobileMenu.classList.add('hidden');
+    }
+});
+
+// Preload critical resources
+const preloadLink = document.createElement('link');
+preloadLink.rel = 'preconnect';
+preloadLink.href = 'https://fonts.googleapis.com';
+document.head.appendChild(preloadLink);
+
+// Add loading="lazy" to images below the fold
+window.addEventListener('load', () => {
+    const images = document.querySelectorAll('img');
+    images.forEach((img, index) => {
+        if (index > 2) { // Skip first 3 images
+            img.loading = 'lazy';
+        }
+    });
+});
+
+// Service Worker Registration (PWA ready - optional)
+if ('serviceWorker' in navigator) {
+    // Uncomment to enable PWA
+    // navigator.serviceWorker.register('/sw.js').then(reg => {
+    //     console.log('Service Worker registered', reg);
+    // });
+}
+
+console.log('%c✨ Portfolio chargé avec succès!', 'color: #10b981; font-size: 16px; font-weight: bold;');
+</script>
+
+</body>
+</html>
